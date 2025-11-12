@@ -1653,34 +1653,115 @@ plot_map <- function(data_input,
   # crop_sf <- function(x) x
   
   # --- Light clipping for speed (keeps smooth rendering, no seams) ---
-  crop_sf <- function(x) {
-    if (is.null(x) || nrow(x) == 0) return(x)
+  # crop_sf <- function(x) {
+  #   if (is.null(x) || nrow(x) == 0) return(x)
+  #   
+  #   # Determine current visible extent
+  #   lon_min <- lon_lat_range[1]; lon_max <- lon_lat_range[2]
+  #   lat_min <- lon_lat_range[3]; lat_max <- lon_lat_range[4]
+  #   lon_span <- abs(lon_max - lon_min); lat_span <- abs(lat_max - lat_min)
+  #   
+  #   # Skip cropping for world-wide or non-UTM projections
+  #   if (!identical(projection, "UTM (default)") ||
+  #       lon_span >= 100 || lat_span >= 70) {
+  #     return(x)
+  #   }
+  #   
+  #   # Compute a slightly padded bounding box (to avoid edge cuts)
+  #   pad <- 2.0
+  #   bb <- sf::st_bbox(c(
+  #     xmin = lon_min - pad, xmax = lon_max + pad,
+  #     ymin = lat_min - pad, ymax = lat_max + pad
+  #   ), crs = sf::st_crs(4326))
+  #   
+  #   # Crop safely in planar mode
+  #   old_s2 <- sf::sf_use_s2()
+  #   on.exit(sf::sf_use_s2(old_s2), add = TRUE)
+  #   sf::sf_use_s2(FALSE)
+  #   
+  #   suppressWarnings(tryCatch(sf::st_crop(x, bb), error = function(e) x))
+  # }
+  
+  ## Let's Test THIS ## !!!!!!!!!!!!!!!!!!!!!!
+  
+  # ---- Smart, artifact-safe clipping & simplification ----
+  
+  .should_clip <- function(lon_lat_range, projection) {
+    # never clip for non-UTM projections (orthographic/robin/laea often cross seams)
+    if (!identical(projection, "UTM (default)")) return(FALSE)
     
-    # Determine current visible extent
     lon_min <- lon_lat_range[1]; lon_max <- lon_lat_range[2]
     lat_min <- lon_lat_range[3]; lat_max <- lon_lat_range[4]
-    lon_span <- abs(lon_max - lon_min); lat_span <- abs(lat_max - lat_min)
     
-    # Skip cropping for world-wide or non-UTM projections
-    if (!identical(projection, "UTM (default)") ||
-        lon_span >= 100 || lat_span >= 70) {
-      return(x)
-    }
+    # treat huge extents as "world": don't clip (prevents continent cuts & seam lines)
+    lon_span <- abs(lon_max - lon_min)
+    lat_span <- abs(lat_max - lat_min)
+    if (lon_span >= 120 || lat_span >= 80) return(FALSE)
     
-    # Compute a slightly padded bounding box (to avoid edge cuts)
-    pad <- 2.0
-    bb <- sf::st_bbox(c(
-      xmin = lon_min - pad, xmax = lon_max + pad,
-      ymin = lat_min - pad, ymax = lat_max + pad
-    ), crs = sf::st_crs(4326))
+    # if bbox touches antimeridian or crosses it -> don't clip
+    if (lon_min <= -170 || lon_max >= 170) return(FALSE)
     
-    # Crop safely in planar mode
+    TRUE
+  }
+  
+  .safe_crop <- function(x, lon_lat_range, projection) {
+    if (is.null(x) || !.should_clip(lon_lat_range, projection)) return(x)
+    bbox <- sf::st_bbox(
+      c(xmin = lon_lat_range[1], xmax = lon_lat_range[2],
+        ymin = lon_lat_range[3], ymax = lon_lat_range[4]),
+      crs = sf::st_crs(4326)
+    )
+    # Crop in planar math to avoid s2/antimeridian artifacts;
+    # switch off s2 just for the crop, then restore previous setting.
     old_s2 <- sf::sf_use_s2()
     on.exit(sf::sf_use_s2(old_s2), add = TRUE)
     sf::sf_use_s2(FALSE)
-    
-    suppressWarnings(tryCatch(sf::st_crop(x, bb), error = function(e) x))
+    suppressWarnings({
+      y <- tryCatch(sf::st_crop(x, bbox), error = function(e) x)
+      # Make valid to prevent hairline issues from invalid rings
+      tryCatch(sf::st_make_valid(y), error = function(e) y)
+    })
   }
+  
+  # Simplify only when zoomed in a bit; tolerance tied to bbox span
+  .maybe_simplify <- function(x, lon_lat_range, projection) {
+    if (is.null(x) || nrow(x) == 0) return(x)
+    if (!.should_clip(lon_lat_range, projection)) return(x)
+    
+    lon_span <- abs(lon_lat_range[2] - lon_lat_range[1])
+    # modest tolerance (degrees); smaller at tight zooms, larger at mid zooms
+    tol <- max(0.02, min(0.2, lon_span / 200))  # ~0.02°–0.2°
+    suppressWarnings(sf::st_simplify(x, dTolerance = tol, preserveTopology = TRUE))
+  }
+  
+  # Unified helper used everywhere
+  crop_sf <- function(x) {
+    x <- .safe_crop(x, lon_lat_range, projection)
+    .maybe_simplify(x, lon_lat_range, projection)
+  }
+  
+  # 1) Crop-only helper: NO simplify (avoids s2 path entirely)
+  crop_sf_nosimplify <- function(x) {
+    .safe_crop(x, lon_lat_range, projection)
+  }
+  
+  # 2) Robust fixer for uploaded shapefiles (planar, make valid, drop Z/M)
+  .fix_user_geom <- function(g) {
+    if (is.null(g)) return(g)
+    old <- sf::sf_use_s2()
+    on.exit(sf::sf_use_s2(old), add = TRUE)
+    sf::sf_use_s2(FALSE)  # avoid s2 during repair
+    
+    g <- tryCatch(sf::st_make_valid(g), error = function(e) g)
+    # drop Z/M if present (some historic sets have Z/M that confuse simplification)
+    g <- tryCatch(sf::st_zm(g, drop = TRUE, what = "ZM"), error = function(e) g)
+    # if it’s a geometry collection, extract polygons/lines safely
+    g <- tryCatch(sf::st_collection_extract(g, "GEOMETRY"), error = function(e) g)
+    
+    g
+  }
+  
+  ## Let's Test THIS ## !!!!!!!!!!!!!!!!!!!!!! UP HERE ^
   
   p <- ggplot() +
     # behalten: gefüllte Konturen (wie zuvor; optisch identisch)
@@ -1735,7 +1816,9 @@ plot_map <- function(data_input,
   # --- statische Layer (vorher bbox-clipping) ---
   p <- p + ggplot2::geom_sf(data = crop_sf(coast), color = "#333333", size = 0.5, inherit.aes = FALSE)
   if (isTRUE(white_ocean)) p <- p + ggplot2::geom_sf(data = crop_sf(oceans), fill = "#DDDDDD", size = 0.5, inherit.aes = FALSE)
-  if (isTRUE(white_land))  p <- p + ggplot2::geom_sf(data = crop_sf(land),   fill = "#DDDDDD", size = 0.5, inherit.aes = FALSE)
+  if (isTRUE(white_land))
+    p <- p + ggplot2::geom_sf(data = crop_sf_nosimplify(land),
+                              fill = "#DDDDDD", color = NA, inherit.aes = FALSE)
   if (isTRUE(c_borders))   p <- p + ggplot2::geom_sf(data = crop_sf(countries), color = "#333333", fill = NA, size = 0.5, inherit.aes = FALSE)
   
   # --- optionale Features (robust gegen NA via isTRUE) ---
@@ -1784,7 +1867,9 @@ plot_map <- function(data_input,
       message(paste("Adding shapefile to plot:", file_name))
       shape <- sf::st_read(file, quiet = TRUE)
       if (is.na(sf::st_crs(shape))) shape <- sf::st_set_crs(shape, sf::st_crs(4326)) else shape <- sf::st_transform(shape, 4326)
-      shape <- crop_sf(shape) # clip to bbox
+      
+      shape <- .fix_user_geom(shape)          # <-- new
+      shape <- crop_sf_nosimplify(shape)      # <-- new (no simplify for user layers)
       
       col_pick <- input[[paste0(color_picker_prefix, file_name)]]
       if (is.null(col_pick) || is.na(col_pick) || !nzchar(col_pick)) col_pick <- "black"
