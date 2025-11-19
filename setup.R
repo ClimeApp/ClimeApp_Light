@@ -79,49 +79,59 @@ setup_user_environment()
 # lib_path <- "/home/ClimeApp/R-packages"
 
 # Load only REQUIRED functions/libraries:
-#Packages
-library(shiny, lib.loc = lib_path)
-library(ncdf4, lib.loc = lib_path)
-library(shinyWidgets, lib.loc = lib_path)
-library(RColorBrewer, lib.loc = lib_path)
-library(shinyjs, lib.loc = lib_path)
-library(bslib, lib.loc = lib_path)
-library(readxl, lib.loc = lib_path)
-library(DT, lib.loc = lib_path)
-library(zoo, lib.loc = lib_path)
-library(colourpicker, lib.loc = lib_path)
-library(ggplot2, lib.loc = lib_path)
-library(sf, lib.loc = lib_path)
-library(shinycssloaders, lib.loc = lib_path)
-library(openxlsx, lib.loc = lib_path)  # Don't change order!
-library(leaflet, lib.loc = lib_path)
-library(htmltools, lib.loc = lib_path)
-library(dplyr, lib.loc = lib_path)
+t <- system.time({
+  #Packages
+  library(shiny, lib.loc = lib_path)
+  library(ncdf4, lib.loc = lib_path)
+  library(shinyWidgets, lib.loc = lib_path)
+  library(RColorBrewer, lib.loc = lib_path)
+  library(shinyjs, lib.loc = lib_path)
+  library(bslib, lib.loc = lib_path)
+  library(readxl, lib.loc = lib_path)
+  library(DT, lib.loc = lib_path)
+  library(colourpicker, lib.loc = lib_path)
+  library(ggplot2, lib.loc = lib_path)
+  library(sf, lib.loc = lib_path)
+  library(shinycssloaders, lib.loc = lib_path)
+  library(openxlsx, lib.loc = lib_path)  # Don't change order!
+  library(htmltools, lib.loc = lib_path)
+  library(dplyr, lib.loc = lib_path)
+  
 
-library(terra, lib.loc = lib_path)
-library(tidyterra, lib.loc = lib_path)
+  
+  library(markdown, lib.loc = lib_path)
+  library(dplR, lib.loc = lib_path)
+  library(burnr, lib.loc = lib_path)
+  library(shinyjqui, lib.loc = lib_path)
+  
+  library(memoise, lib.loc = lib_path) # Memoization utilities (avoid recomputing heavy steps)
+  library(terra, lib.loc = lib_path)
 
-library(ggpattern, lib.loc = lib_path)
-library(viridisLite, lib.loc = lib_path)
-library(viridis, lib.loc = lib_path)
-library(markdown, lib.loc = lib_path)
-library(tmaptools, lib.loc = lib_path)
-library(ggtext, lib.loc = lib_path)
-library(dplR, lib.loc = lib_path)
-library(burnr, lib.loc = lib_path)
-library(shinyjqui, lib.loc = lib_path)
-library(ggrepel, lib.loc = lib_path)
+  
 
-library(memoise, lib.loc = lib_path) # Memoization utilities (avoid recomputing heavy steps)
-library(qs, lib.loc = lib_path)
+  # library(qs, lib.loc = lib_path)
+  # library(shinylogs, lib.loc = lib_path)
 
-# library(plotly, lib.loc = lib_path)
-# library(xlsx, lib.loc = lib_path)
-# library(shinylogs, lib.loc = lib_path)
-# library(maps, lib.loc = lib_path)
-# library(mapdata, lib.loc = lib_path)
-# library(rnaturalearth, lib.loc = lib_path)
-# library(rnaturalearthdata, lib.loc = lib_path)
+  
+  
+  # library(mapdata, lib.loc = lib_path)
+  # library(maps, lib.loc = lib_path)
+  # library(xlsx, lib.loc = lib_path)
+  # library(tmaptools, lib.loc = lib_path)
+  # library(ggpattern, lib.loc = lib_path)
+  # library(ggtext, lib.loc = lib_path)
+  # library(ggrepel, lib.loc = lib_path)
+  # library(rnaturalearth, lib.loc = lib_path)
+  # library(rnaturalearthdata, lib.loc = lib_path)
+  # library(viridisLite, lib.loc = lib_path)
+  # library(viridis, lib.loc = lib_path)
+  # library(leaflet, lib.loc = lib_path)
+  # library(zoo, lib.loc = lib_path)
+  # library(tidyterra, lib.loc = lib_path)
+  # library(plotly, lib.loc = lib_path)
+  
+})
+message("system.time libraries = ", paste(t, collapse = " / "))
 
 #### Design ----
 
@@ -136,7 +146,7 @@ type_list <- c("bivalve_proxy", "coral_proxy", "documentary_proxy", "glacier_ice
 type_names <-c("Bivalve", "Coral", "Documentary", "Glacier ice", "Ice", "Instrumental", "Lake sediment", "Other", "Speleothem", "Tree")
 named_types <- setNames(type_names, type_list)
 # Create a Factor Palette with Paul Tol's Muted Colour List for Colour Blind People
-pal_type <- colorFactor(c('#AA4499', '#CC6677', '#44AA99', '#332288', '#5dbae8', '#882255', '#d0b943', '#000000', '#717126', '#117733'), type_list)
+pal_type <- leaflet::colorFactor(c('#AA4499', '#CC6677', '#44AA99', '#332288', '#5dbae8', '#882255', '#d0b943', '#000000', '#717126', '#117733'), type_list)
 
 variable_list <- c("sea_level_pressure", "no_of_rainy_days", "pressure", "precipitation", "temperature", "historical_proxy", "natural_proxy")
 variable_names <- c("Sea level pressure", "No. of rainy days", "Pressure", "Precipitation", "Temperature", "Historical proxy", "Natural proxy")
@@ -147,161 +157,78 @@ spinner_image = "pics/ClimeApp_Loading_V3.gif"
 spinner_width = 310
 spinner_height = 200
 
-# #### Preprocseeing ----
-# 
-# # Load pre-processed data
-# annual_temp_nc = nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_year.nc")
-# DJF_temp_nc = nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_djf.nc")
-# MAM_temp_nc = nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_mam.nc")
-# JJA_temp_nc = nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_jja.nc")
-# SON_temp_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_son.nc")
-# 
-# annual_prec_nc = nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_year.nc")
-# DJF_prec_nc = nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_djf.nc")
-# MAM_prec_nc = nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_mam.nc")
-# JJA_prec_nc = nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_jja.nc")
-# SON_prec_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_son.nc")
-# 
+#### Preprocseeing ----
+t <- system.time({
+# Load pre-processed data
+annual_temp_nc = nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_year.nc")
+DJF_temp_nc = nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_djf.nc")
+MAM_temp_nc = nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_mam.nc")
+JJA_temp_nc = nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_jja.nc")
+SON_temp_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_son.nc")
+
+annual_prec_nc = nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_year.nc")
+DJF_prec_nc = nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_djf.nc")
+MAM_prec_nc = nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_mam.nc")
+JJA_prec_nc = nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_jja.nc")
+SON_prec_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_son.nc")
+
 # annual_slp_nc = nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_year.nc")
 # DJF_slp_nc = nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_djf.nc")
 # MAM_slp_nc = nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_mam.nc")
 # JJA_slp_nc = nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_jja.nc")
 # SON_slp_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_son.nc")
-# 
-# ## Create dataframe of preprocessed yearly variables
-# ## - pp_data[[season]][[variable]] where
-# ##   season IDs: 1=DJF, 2=MAM, 3=JJA, 4=SON, 5=annual)
-# ##   variable IDs: 1=temp, 2=prec, 3=SLP, 4=Z500)
-# 
-# pp_data = list(vector("list", 4),vector("list", 4),vector("list", 4),vector("list", 4),vector("list", 4))
-# 
-# pp_data[[5]][[1]] = ncvar_get(annual_temp_nc,varid="temp2")-273.15
-# pp_data[[5]][[2]] = ncvar_get(annual_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+
+## Create dataframe of preprocessed yearly variables
+## - pp_data[[season]][[variable]] where
+##   season IDs: 1=DJF, 2=MAM, 3=JJA, 4=SON, 5=annual)
+##   variable IDs: 1=temp, 2=prec, 3=SLP, 4=Z500)
+
+pp_data = list(vector("list", 4),vector("list", 4),vector("list", 4),vector("list", 4),vector("list", 4))
+
+pp_data[[5]][[1]] = ncvar_get(annual_temp_nc,varid="temp2")-273.15
+pp_data[[5]][[2]] = ncvar_get(annual_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
 # pp_data[[5]][[3]] = ncvar_get(annual_slp_nc,varid="slp")/100
-# 
-# pp_data[[1]][[1]] = ncvar_get(DJF_temp_nc,varid="temp2")-273.15
-# pp_data[[1]][[2]] = ncvar_get(DJF_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+
+pp_data[[1]][[1]] = ncvar_get(DJF_temp_nc,varid="temp2")-273.15
+pp_data[[1]][[2]] = ncvar_get(DJF_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
 # pp_data[[1]][[3]] = ncvar_get(DJF_slp_nc,varid="slp")/100
-# 
-# pp_data[[2]][[1]] = ncvar_get(MAM_temp_nc,varid="temp2")-273.15
-# pp_data[[2]][[2]] = ncvar_get(MAM_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+
+pp_data[[2]][[1]] = ncvar_get(MAM_temp_nc,varid="temp2")-273.15
+pp_data[[2]][[2]] = ncvar_get(MAM_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
 # pp_data[[2]][[3]] = ncvar_get(MAM_slp_nc,varid="slp")/100
-# 
-# pp_data[[3]][[1]] = ncvar_get(JJA_temp_nc,varid="temp2")-273.15
-# pp_data[[3]][[2]] = ncvar_get(JJA_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+
+pp_data[[3]][[1]] = ncvar_get(JJA_temp_nc,varid="temp2")-273.15
+pp_data[[3]][[2]] = ncvar_get(JJA_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
 # pp_data[[3]][[3]] = ncvar_get(JJA_slp_nc,varid="slp")/100
-# 
-# pp_data[[4]][[1]] = ncvar_get(SON_temp_nc,varid="temp2")-273.15
-# pp_data[[4]][[2]] = ncvar_get(SON_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+
+pp_data[[4]][[1]] = ncvar_get(SON_temp_nc,varid="temp2")-273.15
+pp_data[[4]][[2]] = ncvar_get(SON_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
 # pp_data[[4]][[3]] = ncvar_get(SON_slp_nc,varid="slp")/100
-# 
-# # Extract list of longitudes/latitudes
-# lon = annual_temp_nc$dim[[3]]$vals
-# lat = annual_temp_nc$dim[[4]]$vals
-# 
-# ## Close pre-processed netCDF files
-# nc_close(annual_temp_nc)
-# nc_close(DJF_temp_nc)
-# nc_close(MAM_temp_nc)
-# nc_close(JJA_temp_nc)
-# nc_close(SON_temp_nc)
-# 
-# nc_close(annual_prec_nc)
-# nc_close(DJF_prec_nc)
-# nc_close(MAM_prec_nc)
-# nc_close(JJA_prec_nc)
-# nc_close(SON_prec_nc)
-# 
+
+# Extract list of longitudes/latitudes
+lon = annual_temp_nc$dim[[3]]$vals
+lat = annual_temp_nc$dim[[4]]$vals
+
+## Close pre-processed netCDF files
+nc_close(annual_temp_nc)
+nc_close(DJF_temp_nc)
+nc_close(MAM_temp_nc)
+nc_close(JJA_temp_nc)
+nc_close(SON_temp_nc)
+
+nc_close(annual_prec_nc)
+nc_close(DJF_prec_nc)
+nc_close(MAM_prec_nc)
+nc_close(JJA_prec_nc)
+nc_close(SON_prec_nc)
+
 # nc_close(annual_slp_nc)
 # nc_close(DJF_slp_nc)
 # nc_close(MAM_slp_nc)
 # nc_close(JJA_slp_nc)
 # nc_close(SON_slp_nc)
-
-
-
-
-# ---- Cache für pp_data ----
-dir.create("cache", showWarnings = FALSE)
-
-build_pp_cache <- function() {
-
-  # Open pre-processed data
-  annual_temp_nc <- nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_year.nc")
-  DJF_temp_nc    <- nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_djf.nc")
-  MAM_temp_nc    <- nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_mam.nc")
-  JJA_temp_nc    <- nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_jja.nc")
-  SON_temp_nc    <- nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_son.nc")
-
-  annual_prec_nc <- nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_year.nc")
-  DJF_prec_nc    <- nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_djf.nc")
-  MAM_prec_nc    <- nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_mam.nc")
-  JJA_prec_nc    <- nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_jja.nc")
-  SON_prec_nc    <- nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_son.nc")
-
-  annual_slp_nc  <- nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_year.nc")
-  DJF_slp_nc     <- nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_djf.nc")
-  MAM_slp_nc     <- nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_mam.nc")
-  JJA_slp_nc     <- nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_jja.nc")
-  SON_slp_nc     <- nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_son.nc")
-
-  ## Create dataframe of preprocessed yearly variables
-  ## - pp_data[[season]][[variable]] where
-  ##   season IDs: 1=DJF, 2=MAM, 3=JJA, 4=SON, 5=annual)
-  ##   variable IDs: 1=temp, 2=prec, 3=SLP, 4=Z500)
-  pp_data <- vector("list", 5)
-  for (i in 1:5) pp_data[[i]] <- vector("list", 4)
-
-  pp_data[[5]][[1]] <- ncvar_get(annual_temp_nc, "temp2") - 273.15
-  pp_data[[5]][[2]] <- ncvar_get(annual_prec_nc, "totprec") * 2629756.8
-  pp_data[[5]][[3]] <- ncvar_get(annual_slp_nc,  "slp")/100
-
-  pp_data[[1]][[1]] <- ncvar_get(DJF_temp_nc, "temp2") - 273.15
-  pp_data[[1]][[2]] <- ncvar_get(DJF_prec_nc, "totprec") * 2629756.8
-  pp_data[[1]][[3]] <- ncvar_get(DJF_slp_nc,  "slp")/100
-
-  pp_data[[2]][[1]] <- ncvar_get(MAM_temp_nc, "temp2") - 273.15
-  pp_data[[2]][[2]] <- ncvar_get(MAM_prec_nc, "totprec") * 2629756.8
-  pp_data[[2]][[3]] <- ncvar_get(MAM_slp_nc,  "slp")/100
-
-  pp_data[[3]][[1]] <- ncvar_get(JJA_temp_nc, "temp2") - 273.15
-  pp_data[[3]][[2]] <- ncvar_get(JJA_prec_nc, "totprec") * 2629756.8
-  pp_data[[3]][[3]] <- ncvar_get(JJA_slp_nc,  "slp")/100
-
-  pp_data[[4]][[1]] <- ncvar_get(SON_temp_nc, "temp2") - 273.15
-  pp_data[[4]][[2]] <- ncvar_get(SON_prec_nc, "totprec") * 2629756.8
-  pp_data[[4]][[3]] <- ncvar_get(SON_slp_nc,  "slp")/100
-
-
-  # Extract list of longitudes/latitudes
-  lon <- annual_temp_nc$dim[[3]]$vals
-  lat <- annual_temp_nc$dim[[4]]$vals
-
-  # Close pre-processed netCDF files
-  lapply(list(annual_temp_nc,DJF_temp_nc,MAM_temp_nc,JJA_temp_nc,SON_temp_nc,
-              annual_prec_nc,DJF_prec_nc,MAM_prec_nc,JJA_prec_nc,SON_prec_nc,
-              annual_slp_nc,DJF_slp_nc,MAM_slp_nc,JJA_slp_nc,SON_slp_nc), nc_close)
-
-  # Serializer
-  if (!requireNamespace("qs", quietly = TRUE))
-    install.packages("qs", lib = lib_path)
-  qs::qsave(list(pp_data = pp_data, lon = lon, lat = lat),
-            "cache/pp_data_v1.qs")
-}
-
-# On startup: load cache (or build it once)
-if (file.exists("cache/pp_data_v1.qs")) {
-  obj <- qs::qread("cache/pp_data_v1.qs")
-  pp_data <- obj$pp_data
-  lon <- obj$lon
-  lat <- obj$lat
-} else {
-  build_pp_cache()
-  obj <- qs::qread("cache/pp_data_v1.qs")
-  pp_data <- obj$pp_data
-  lon <- obj$lon
-  lat <- obj$lat
-}
+})
+message("system.time data = ", paste(t, collapse = " / "))
 
 ## Create dataframe of continent lon/lats and Set initial latlon values
 Europe = c(-30,40,30,75) 
@@ -334,6 +261,8 @@ random_century = sample(1:6,1)
 
 initial_year_values = century_years[,random_century]
 
+
+t <- system.time({
 ## Load grid square weights for calculating means
 latlon_weights = as.matrix(read.csv("data/latlon_weights.csv"))
 
@@ -352,4 +281,5 @@ land <- readRDS("data/geodata_maps/land.rds")
 lakes <- readRDS("data/geodata_custom_maps/lakes.rds")
 mountains <- readRDS("data/geodata_custom_maps/mountains.rds")
 rivers <- readRDS("data/geodata_custom_maps/rivers.rds")
-
+})
+message("system.time custom layers = ", paste(t, collapse = " / "))

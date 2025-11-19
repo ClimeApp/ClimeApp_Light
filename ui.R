@@ -4,6 +4,7 @@ source("helpers.R")
 source("popovers.R")
 source("setup.R")
 
+
 # Define UI ----
 
 ui <- navbarPage(
@@ -158,7 +159,7 @@ ui <- navbarPage(
   # --- Navbar styling and properties ---
   theme = bs_theme(version = 5, bootswatch = "united", primary = "#094030", navbar_bg = "#094030"),
   position = "fixed-top",
-  windowTitle = "ClimeApp (light)",
+  windowTitle = "ClimeApp",
   collapsible = TRUE,
   
   # Welcome START ----                             
@@ -198,10 +199,10 @@ ui <- navbarPage(
                  column(
                    width = 12,
                    style = "border: 5px solid #094030; padding: 10px; border-radius: 5px; color: #094030; background-color: white;",
-                   h5(strong("Note to ClimeApp Light", style = "color: #094030;")),
+                   h5(strong("Notice", style = "color: #094030;")),
                    h5(
-                     "This is the light version of ClimeApp. Download the full desktop version",
-                     actionLink("go_desktop", tags$strong("here"))
+                     "This is ", strong("ClimeApp Light."), "Download the full desktop version ",
+                     actionLink("go_desktop", tags$strong("here."))
                    )
                  ), 
                  

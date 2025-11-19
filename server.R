@@ -1,4 +1,5 @@
 # Define server logic ----
+
 server <- function(input, output, session) {
   # ClimeApp Desktop Download ----
   observeEvent(input$go_desktop, {
@@ -1681,14 +1682,14 @@ server <- function(input, output, session) {
       result <- NULL
       
       if (projection == "UTM (default)") {
-        result <- geocode_OSM(location_encoded)
+        result <- tmaptools::geocode_OSM(location_encoded)
       } else if (projection == "Robinson") {
-        result <- geocode_OSM(location_encoded, projection = "+proj=robin")
+        result <- tmaptools::geocode_OSM(location_encoded, projection = "+proj=robin")
       } else if (projection == "Orthographic") {
-        result <- geocode_OSM(location_encoded,
+        result <- tmaptools::geocode_OSM(location_encoded,
                               projection = ortho_proj(input$center_lat, input$center_lon))
       } else if (projection == "LAEA") {
-        result <- geocode_OSM(location_encoded, projection = laea_proj)
+        result <- tmaptools::geocode_OSM(location_encoded, projection = laea_proj)
       }
       
       if (!is.null(result$coords)) {
@@ -2738,14 +2739,14 @@ server <- function(input, output, session) {
       result <- NULL
       
       if (projection == "UTM (default)") {
-        result <- geocode_OSM(location_encoded2)
+        result <- tmaptools::geocode_OSM(location_encoded2)
       } else if (projection == "Robinson") {
-        result <- geocode_OSM(location_encoded2, projection = "+proj=robin")
+        result <- tmaptools::geocode_OSM(location_encoded2, projection = "+proj=robin")
       } else if (projection == "Orthographic") {
-        result <- geocode_OSM(location_encoded2,
+        result <- tmaptools::geocode_OSM(location_encoded2,
                               projection = ortho_proj(input$center_lat2, input$center_lon2))
       } else if (projection == "LAEA") {
-        result <- geocode_OSM(location_encoded2, projection = laea_proj)
+        result <- tmaptools::geocode_OSM(location_encoded2, projection = laea_proj)
       }
       
       if (!is.null(result$coords)) {
@@ -4148,14 +4149,14 @@ server <- function(input, output, session) {
       result <- NULL
       
       if (projection3 == "UTM (default)") {
-        result <- geocode_OSM(location_encoded3)
+        result <- tmaptools::geocode_OSM(location_encoded3)
       } else if (projection3 == "Robinson") {
-        result <- geocode_OSM(location_encoded3, projection = "+proj=robin")
+        result <- tmaptools::geocode_OSM(location_encoded3, projection = "+proj=robin")
       } else if (projection3 == "Orthographic") {
-        result <- geocode_OSM(location_encoded3,
+        result <- tmaptools::geocode_OSM(location_encoded3,
                               projection = ortho_proj(input$center_lat3, input$center_lon3))
       } else if (projection3 == "LAEA") {
-        result <- geocode_OSM(location_encoded3, projection = laea_proj)
+        result <- tmaptools::geocode_OSM(location_encoded3, projection = laea_proj)
       }
       
       if (!is.null(result$coords)) {
@@ -6043,6 +6044,11 @@ server <- function(input, output, session) {
     
     dim_key <- paste0(map_dimensions()[1], "x", map_dimensions()[2])
     
+    titles_key <- tryCatch({
+      digest::digest(plot_titles())
+    }, error = function(e) "")
+    
+    
     list(
       input$nav1,
       input$value_type_map_data,
@@ -6076,12 +6082,10 @@ server <- function(input, output, session) {
       input$label_lakes,
       input$show_mountains,
       input$label_mountains,
-      plotOrder(),
       input$shapes_order[input$shapes_order %in% input$shapes],
       input$title_mode,
       input$title_mode_ts,
-      input$title1_input,
-      input$title2_input,
+      titles_key,
       input$title1_input_ts,
       input$title_size_input,
       input$title_size_input_ts,

@@ -1,6 +1,5 @@
 # Helper Functions of ClimeApp 
 
-
 #### Caching helpers for maps ####
 # Use ragg for crisp text/lines in Shiny plots
 options(shiny.useragg = TRUE)
@@ -432,11 +431,11 @@ generate_data_ID = function(dataset,
     dataset_ref = 2
   } else if (dataset == "ModE-RAclim"){
     dataset_ref = 3
-  } else { # dataset == "Sd ratio"
+  } else { # dataset == "SD ratio"
     dataset_ref = 4   
   }
   
-  # generate variable reference
+  # Generate variable reference
   if (variable == "Temperature"){
     variable_ref = 1      
   } else if (variable == "Precipitation"){
@@ -447,55 +446,67 @@ generate_data_ID = function(dataset,
     variable_ref = 4
   }
   
-  # Check for pp data and add season reference
-  if (dataset == "ModE-RA" & variable != "Z500"){
-    # generate season reference
-    if (identical(month_range,c(1,12))){
-      season_ref = 5
-      pp_available = 1
-    } else if (identical(month_range,c(0,2))){
-      season_ref = 1
-      pp_available = 1
-    } else if (identical(month_range,c(3,5))){
-      season_ref = 2
-      pp_available = 1
-    } else if (identical(month_range,c(6,8))){
-      season_ref = 3
-      pp_available = 1
-    } else if (identical(month_range,c(9,11))){
-      season_ref = 4
-      pp_available = 1
+  # Helper: map month_range to (season_ref, pp_available) for a given pp flag
+  set_season_and_pp <- function(month_range, pp_flag_if_match) {
+    if (identical(month_range, c(1,12))) {
+      season_ref <- 5
+      pp_available <- pp_flag_if_match
+    } else if (identical(month_range, c(0,2))) {
+      season_ref <- 1
+      pp_available <- pp_flag_if_match
+    } else if (identical(month_range, c(3,5))) {
+      season_ref <- 2
+      pp_available <- pp_flag_if_match
+    } else if (identical(month_range, c(6,8))) {
+      season_ref <- 3
+      pp_available <- pp_flag_if_match
+    } else if (identical(month_range, c(9,11))) {
+      season_ref <- 4
+      pp_available <- pp_flag_if_match
     } else {
-      season_ref = NA
-      pp_available = 0
-    } 
-  } else { # Other data (may be preprocessed, but may need to be loaded in) 
-    if (identical(month_range,c(1,12))){
-      season_ref = 5
-      pp_available = 2
-    } else if (identical(month_range,c(0,2))){
-      season_ref = 1
-      pp_available = 2
-    } else if (identical(month_range,c(3,5))){
-      season_ref = 2
-      pp_available = 2
-    } else if (identical(month_range,c(6,8))){
-      season_ref = 3
-      pp_available = 2
-    } else if (identical(month_range,c(9,11))){
-      season_ref = 4
-      pp_available = 2
-    } else {
-      season_ref = NA
-      pp_available = 0
-    } 
+      season_ref <- NA
+      pp_available <- 0
+    }
+    list(season_ref = season_ref, pp_available = pp_available)
   }
   
-  # Create data reference
-  data_ref = c(pp_available,dataset_ref,variable_ref,season_ref)
+  # Check for preprocessed data and add season reference
+  if (dataset == "ModE-RA" && variable %in% c("Temperature", "Precipitation")) {
+    
+    # ModE-RA Temperature & Precipitation:
+    # preprocessed AND preloaded in pp_data -> pp_available = 1
+    res <- set_season_and_pp(month_range, pp_flag_if_match = 1)
+    season_ref   <- res$season_ref
+    pp_available <- res$pp_available
+    
+  } else if (dataset == "ModE-RA" && variable == "SLP") {
+    
+    # ModE-RA SLP:
+    # preprocessed exists (seasonal/year files) BUT not preloaded in pp_data
+    # -> pp_available = 2
+    res <- set_season_and_pp(month_range, pp_flag_if_match = 2)
+    season_ref   <- res$season_ref
+    pp_available <- res$pp_available
+    
+  } else {
+    
+    # Other data (ModE-Sim, ModE-RAclim, SD ratio, or Z500 for any dataset):
+    # may be preprocessed, but is never preloaded in pp_data
+    # -> pp_available = 2 for standard seasons/year
+    res <- set_season_and_pp(month_range, pp_flag_if_match = 2)
+    season_ref   <- res$season_ref
+    pp_available <- res$pp_available
+  }
   
-  return (data_ref)
-}        
+  # Create data reference:
+  #  pp_available:
+  #    0 = no preprocessed data
+  #    1 = preprocessed & preloaded (pp_data)
+  #    2 = preprocessed exists but must be loaded
+  data_ref = c(pp_available, dataset_ref, variable_ref, season_ref)
+  
+  return(data_ref)
+}
 
 
 #' (General) LOAD FULL ModE DATA
@@ -2163,7 +2174,7 @@ add_stats_to_TS_datatable = function(data_input,
   # Create moving average column
   Moving_Average = NULL
   if (add_moving_average == TRUE){
-    Moving_Average = rollmean(Mean, k=moving_average_range, fill=NA, align=moving_average_alignment)
+    Moving_Average = zoo::rollmean(Mean, k=moving_average_range, fill=NA, align=moving_average_alignment)
   }
   
   # Create percentile columns
@@ -7550,9 +7561,9 @@ plot_monthly_timeseries <- function(data = NA,
       lwidth = 1
     }
     
-    x = as.Date(c())
+    x = zoo::as.Date(c())
     for (j in 5:16){
-      x = c(x,as.Date(paste0("2000-",j-4,"-01")))
+      x = c(x,zoo::as.Date(paste0("2000-",j-4,"-01")))
     }
     
     new_line = data.frame(
@@ -7578,7 +7589,7 @@ plot_monthly_timeseries <- function(data = NA,
   new_line = data.frame(
     ID = lID,
     label = NA,
-    x = as.Date("2000-01-01"),
+    x = zoo::as.Date("2000-01-01"),
     y = c(y_Min,y_Max),
     lcolor = "white",
     ltype = "solid",
@@ -7598,7 +7609,7 @@ plot_monthly_timeseries <- function(data = NA,
         x_line = line_data$location
         y_line = c(y_Min,y_Max)
       } else { # Orientation == "Horizontal"
-        x_line = c(as.Date("2000-01-01"),as.Date("2000-12-01"))
+        x_line = c(zoo::as.Date("2000-01-01"),zoo::as.Date("2000-12-01"))
         y_line = line_data$location
       }
       
@@ -7695,8 +7706,8 @@ plot_monthly_timeseries <- function(data = NA,
     for (i in 1:(fID-1)){
       fill_data = subset(fills_data, ID == i)
       # Convert x values to dates
-      fill_data$x1 = as.Date(fill_data$x1)
-      fill_data$x2 = as.Date(fill_data$x2)
+      fill_data$x1 = zoo::as.Date(fill_data$x1)
+      fill_data$x2 = zoo::as.Date(fill_data$x2)
       
       if (fill_data$key_show){ # Show on legend
         p = p +  geom_rect(
@@ -7762,8 +7773,8 @@ plot_monthly_timeseries <- function(data = NA,
     for (i in 1:(bID-1)){
       box_data = subset(boxes_data, ID == i)
       # Convert x values to dates
-      box_data$x1 = as.Date(box_data$x1)
-      box_data$x2 = as.Date(box_data$x2)
+      box_data$x1 = zoo::as.Date(box_data$x1)
+      box_data$x2 = zoo::as.Date(box_data$x2)
       
       if (box_data$key_show){ # Show on legend
         p = p +  geom_rect(
@@ -7796,7 +7807,7 @@ plot_monthly_timeseries <- function(data = NA,
     for (i in 1:nrow(points_data)){
       point_data = points_data[i,]
       # Convert points_data x value to date
-      point_data$x = as.Date(point_data$x)
+      point_data$x = zoo::as.Date(point_data$x)
       
       if (point_data$key_show){ # Show on legend
         p = p + geom_point(
