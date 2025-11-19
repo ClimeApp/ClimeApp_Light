@@ -80,9 +80,10 @@ setup_user_environment()
 
 # Load only REQUIRED functions/libraries:
 t <- system.time({
+  
+  # Load only REQUIRED functions/libraries:
   #Packages
   library(shiny, lib.loc = lib_path)
-  library(ncdf4, lib.loc = lib_path)
   library(shinyWidgets, lib.loc = lib_path)
   library(RColorBrewer, lib.loc = lib_path)
   library(shinyjs, lib.loc = lib_path)
@@ -92,30 +93,20 @@ t <- system.time({
   library(colourpicker, lib.loc = lib_path)
   library(ggplot2, lib.loc = lib_path)
   library(sf, lib.loc = lib_path)
+  library(shinylogs, lib.loc = lib_path)
   library(shinycssloaders, lib.loc = lib_path)
   library(openxlsx, lib.loc = lib_path)  # Don't change order!
   library(htmltools, lib.loc = lib_path)
   library(dplyr, lib.loc = lib_path)
-  
-
-  
   library(markdown, lib.loc = lib_path)
   library(dplR, lib.loc = lib_path)
   library(burnr, lib.loc = lib_path)
   library(shinyjqui, lib.loc = lib_path)
-  
-  library(memoise, lib.loc = lib_path) # Memoization utilities (avoid recomputing heavy steps)
   library(terra, lib.loc = lib_path)
-
+  library(ncdf4, lib.loc = lib_path)
   
-
-  # library(qs, lib.loc = lib_path)
-  # library(shinylogs, lib.loc = lib_path)
-
-  
-  
-  # library(mapdata, lib.loc = lib_path)
   # library(maps, lib.loc = lib_path)
+  # library(mapdata, lib.loc = lib_path)
   # library(xlsx, lib.loc = lib_path)
   # library(tmaptools, lib.loc = lib_path)
   # library(ggpattern, lib.loc = lib_path)
@@ -126,10 +117,10 @@ t <- system.time({
   # library(viridisLite, lib.loc = lib_path)
   # library(viridis, lib.loc = lib_path)
   # library(leaflet, lib.loc = lib_path)
+  # library(leaflet.providers, lib.loc = lib_path)
   # library(zoo, lib.loc = lib_path)
   # library(tidyterra, lib.loc = lib_path)
   # library(plotly, lib.loc = lib_path)
-  
 })
 message("system.time libraries = ", paste(t, collapse = " / "))
 
