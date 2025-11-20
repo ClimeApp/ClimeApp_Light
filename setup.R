@@ -97,7 +97,7 @@ t <- system.time({
   # library(DT, lib.loc = lib_path)
   # library(colourpicker, lib.loc = lib_path)
   # library(sf, lib.loc = lib_path)
-  # # library(shinylogs, lib.loc = lib_path)
+  # library(shinylogs, lib.loc = lib_path)
   # library(shinycssloaders, lib.loc = lib_path)
   # library(openxlsx, lib.loc = lib_path)  # Don't change order!
   # library(dplyr, lib.loc = lib_path)
