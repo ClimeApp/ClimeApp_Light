@@ -25,8 +25,8 @@ setup_user_environment <- function() {
     ),
     
     "Niklaus Emanuel" = list(
-      setwd = "C:/Users/Niklaus Emanuel/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp",
-      lib_path = "C:/Users/Niklaus Emanuel/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp/library"
+      setwd = "H:/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp",
+      lib_path = "H:/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp/library"
     ),
     
     # Richard
@@ -84,27 +84,29 @@ t <- system.time({
   
   # Load only REQUIRED functions/libraries:
   #Packages
+  
   library(shiny, lib.loc = lib_path)
-  library(shinyWidgets, lib.loc = lib_path)
-  library(RColorBrewer, lib.loc = lib_path)
-  library(shinyjs, lib.loc = lib_path)
-  library(bslib, lib.loc = lib_path)
-  library(readxl, lib.loc = lib_path)
-  library(DT, lib.loc = lib_path)
-  library(colourpicker, lib.loc = lib_path)
   library(ggplot2, lib.loc = lib_path)
-  library(sf, lib.loc = lib_path)
-  library(shinylogs, lib.loc = lib_path)
-  library(shinycssloaders, lib.loc = lib_path)
-  library(openxlsx, lib.loc = lib_path)  # Don't change order!
   library(htmltools, lib.loc = lib_path)
-  library(dplyr, lib.loc = lib_path)
-  library(markdown, lib.loc = lib_path)
-  library(dplR, lib.loc = lib_path)
-  library(burnr, lib.loc = lib_path)
-  library(shinyjqui, lib.loc = lib_path)
   library(terra, lib.loc = lib_path)
-  library(ncdf4, lib.loc = lib_path)
+  
+  #library(shinyWidgets, lib.loc = lib_path)
+  #library(RColorBrewer, lib.loc = lib_path)
+  # library(shinyjs, lib.loc = lib_path)
+  # library(bslib, lib.loc = lib_path)
+  # library(readxl, lib.loc = lib_path)
+  # library(DT, lib.loc = lib_path)
+  # library(colourpicker, lib.loc = lib_path)
+  # library(sf, lib.loc = lib_path)
+  # library(shinylogs, lib.loc = lib_path)
+  # library(shinycssloaders, lib.loc = lib_path)
+  # library(openxlsx, lib.loc = lib_path)  # Don't change order!
+  # library(dplyr, lib.loc = lib_path)
+  # library(markdown, lib.loc = lib_path)
+  # library(dplR, lib.loc = lib_path)
+  # library(burnr, lib.loc = lib_path)
+  # library(shinyjqui, lib.loc = lib_path)
+  # library(ncdf4, lib.loc = lib_path)
   
   # library(maps, lib.loc = lib_path)
   # library(mapdata, lib.loc = lib_path)
@@ -131,7 +133,7 @@ message("system.time libraries = ", paste(t, collapse = " / "))
 addResourcePath(prefix = 'pics', directoryPath = "www")
 
 # Choosing theme and making colouring changes
-my_theme <- bs_theme(version = 5, bootswatch = "united", primary = "#094030")
+#my_theme <- bslib::bs_theme(version = 5, bootswatch = "united", primary = "#094030")
 
 # Colour palette and variable names for ModE-RA source leaflet
 type_list <- c("bivalve_proxy", "coral_proxy", "documentary_proxy", "glacier_ice_proxy", "ice_proxy", "instrumental_data", "lake_sediment_proxy", "other_proxy", "speleothem_proxy", "tree_proxy")
@@ -152,23 +154,23 @@ spinner_height = 200
 #### Preprocseeing ----
 t <- system.time({
 # Load pre-processed data
-annual_temp_nc = nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_year.nc")
-DJF_temp_nc = nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_djf.nc")
-MAM_temp_nc = nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_mam.nc")
-JJA_temp_nc = nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_jja.nc")
-SON_temp_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_son.nc")
+annual_temp_nc = ncdf4::nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_year.nc")
+DJF_temp_nc = ncdf4::nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_djf.nc")
+MAM_temp_nc = ncdf4::nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_mam.nc")
+JJA_temp_nc = ncdf4::nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_jja.nc")
+SON_temp_nc = ncdf4::nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_son.nc")
 
-annual_prec_nc = nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_year.nc")
-DJF_prec_nc = nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_djf.nc")
-MAM_prec_nc = nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_mam.nc")
-JJA_prec_nc = nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_jja.nc")
-SON_prec_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_son.nc")
+annual_prec_nc = ncdf4::nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_year.nc")
+DJF_prec_nc = ncdf4::nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_djf.nc")
+MAM_prec_nc = ncdf4::nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_mam.nc")
+JJA_prec_nc = ncdf4::nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_jja.nc")
+SON_prec_nc = ncdf4::nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_son.nc")
 
-# annual_slp_nc = nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_year.nc")
-# DJF_slp_nc = nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_djf.nc")
-# MAM_slp_nc = nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_mam.nc")
-# JJA_slp_nc = nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_jja.nc")
-# SON_slp_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_son.nc")
+# annual_slp_nc = ncdf4::nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_year.nc")
+# DJF_slp_nc = ncdf4::nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_djf.nc")
+# MAM_slp_nc = ncdf4::nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_mam.nc")
+# JJA_slp_nc = ncdf4::nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_jja.nc")
+# SON_slp_nc = ncdf4::nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_son.nc")
 
 ## Create dataframe of preprocessed yearly variables
 ## - pp_data[[season]][[variable]] where
@@ -177,48 +179,48 @@ SON_prec_nc = nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_e
 
 pp_data = list(vector("list", 4),vector("list", 4),vector("list", 4),vector("list", 4),vector("list", 4))
 
-pp_data[[5]][[1]] = ncvar_get(annual_temp_nc,varid="temp2")-273.15
-pp_data[[5]][[2]] = ncvar_get(annual_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[5]][[3]] = ncvar_get(annual_slp_nc,varid="slp")/100
+pp_data[[5]][[1]] = ncdf4::ncvar_get(annual_temp_nc,varid="temp2")-273.15
+pp_data[[5]][[2]] = ncdf4::ncvar_get(annual_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+# pp_data[[5]][[3]] = ncdf4::ncvar_get(annual_slp_nc,varid="slp")/100
 
-pp_data[[1]][[1]] = ncvar_get(DJF_temp_nc,varid="temp2")-273.15
-pp_data[[1]][[2]] = ncvar_get(DJF_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[1]][[3]] = ncvar_get(DJF_slp_nc,varid="slp")/100
+pp_data[[1]][[1]] = ncdf4::ncvar_get(DJF_temp_nc,varid="temp2")-273.15
+pp_data[[1]][[2]] = ncdf4::ncvar_get(DJF_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+# pp_data[[1]][[3]] = ncdf4::ncvar_get(DJF_slp_nc,varid="slp")/100
 
-pp_data[[2]][[1]] = ncvar_get(MAM_temp_nc,varid="temp2")-273.15
-pp_data[[2]][[2]] = ncvar_get(MAM_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[2]][[3]] = ncvar_get(MAM_slp_nc,varid="slp")/100
+pp_data[[2]][[1]] = ncdf4::ncvar_get(MAM_temp_nc,varid="temp2")-273.15
+pp_data[[2]][[2]] = ncdf4::ncvar_get(MAM_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+# pp_data[[2]][[3]] = ncdf4::ncvar_get(MAM_slp_nc,varid="slp")/100
 
-pp_data[[3]][[1]] = ncvar_get(JJA_temp_nc,varid="temp2")-273.15
-pp_data[[3]][[2]] = ncvar_get(JJA_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[3]][[3]] = ncvar_get(JJA_slp_nc,varid="slp")/100
+pp_data[[3]][[1]] = ncdf4::ncvar_get(JJA_temp_nc,varid="temp2")-273.15
+pp_data[[3]][[2]] = ncdf4::ncvar_get(JJA_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+# pp_data[[3]][[3]] = ncdf4::ncvar_get(JJA_slp_nc,varid="slp")/100
 
-pp_data[[4]][[1]] = ncvar_get(SON_temp_nc,varid="temp2")-273.15
-pp_data[[4]][[2]] = ncvar_get(SON_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[4]][[3]] = ncvar_get(SON_slp_nc,varid="slp")/100
+pp_data[[4]][[1]] = ncdf4::ncvar_get(SON_temp_nc,varid="temp2")-273.15
+pp_data[[4]][[2]] = ncdf4::ncvar_get(SON_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
+# pp_data[[4]][[3]] = ncdf4::ncvar_get(SON_slp_nc,varid="slp")/100
 
 # Extract list of longitudes/latitudes
 lon = annual_temp_nc$dim[[3]]$vals
 lat = annual_temp_nc$dim[[4]]$vals
 
 ## Close pre-processed netCDF files
-nc_close(annual_temp_nc)
-nc_close(DJF_temp_nc)
-nc_close(MAM_temp_nc)
-nc_close(JJA_temp_nc)
-nc_close(SON_temp_nc)
+ncdf4::nc_close(annual_temp_nc)
+ncdf4::nc_close(DJF_temp_nc)
+ncdf4::nc_close(MAM_temp_nc)
+ncdf4::nc_close(JJA_temp_nc)
+ncdf4::nc_close(SON_temp_nc)
 
-nc_close(annual_prec_nc)
-nc_close(DJF_prec_nc)
-nc_close(MAM_prec_nc)
-nc_close(JJA_prec_nc)
-nc_close(SON_prec_nc)
+ncdf4::nc_close(annual_prec_nc)
+ncdf4::nc_close(DJF_prec_nc)
+ncdf4::nc_close(MAM_prec_nc)
+ncdf4::nc_close(JJA_prec_nc)
+ncdf4::nc_close(SON_prec_nc)
 
-# nc_close(annual_slp_nc)
-# nc_close(DJF_slp_nc)
-# nc_close(MAM_slp_nc)
-# nc_close(JJA_slp_nc)
-# nc_close(SON_slp_nc)
+# ncdf4::nc_close(annual_slp_nc)
+# ncdf4::nc_close(DJF_slp_nc)
+# ncdf4::nc_close(MAM_slp_nc)
+# ncdf4::nc_close(JJA_slp_nc)
+# ncdf4::nc_close(SON_slp_nc)
 })
 message("system.time data = ", paste(t, collapse = " / "))
 
@@ -259,10 +261,10 @@ t <- system.time({
 latlon_weights = as.matrix(read.csv("data/latlon_weights.csv"))
 
 # Load shapefiles for maps (rnaturalearth)
-# coast <- st_read("data/geodata_maps/coast.shp")
-# countries <- st_read("data/geodata_maps/countries.shp")
-# oceans <- st_read("data/geodata_maps/oceans.shp")
-# land <- st_read("data/geodata_maps/land.shp")
+# coast <- sf::st_read("data/geodata_maps/coast.shp")
+# countries <- sf::st_read("data/geodata_maps/countries.shp")
+# oceans <- sf::st_read("data/geodata_maps/oceans.shp")
+# land <- sf::st_read("data/geodata_maps/land.shp")
 
 coast <- readRDS("data/geodata_maps/coast.rds")
 countries <- readRDS("data/geodata_maps/countries.rds")
@@ -276,5 +278,3 @@ rivers <- readRDS("data/geodata_custom_maps/rivers.rds")
 })
 message("system.time custom layers = ", paste(t, collapse = " / "))
 
-})
-message("system.time setup.R = ", paste(t, collapse = " / "))
