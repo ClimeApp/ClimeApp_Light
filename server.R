@@ -249,22 +249,6 @@ server <- function(input, output, session) {
                            condition = input$feature == "Highlight",
                            asis = FALSE)})
   
-  observe({shinyjs::toggle(id = "hidden_custom_statistics",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$enable_custom_statistics == TRUE,
-                           asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_SD_ratio",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$custom_statistic == "SD ratio",
-                           asis = FALSE)})
-  
   observe({shinyjs::toggle(id = "hidden_download",
                            anim = TRUE,
                            animType = "slide",
@@ -308,39 +292,7 @@ server <- function(input, output, session) {
                            selector = NULL,
                            condition = input$show_key_ts == TRUE,
                            asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_custom_statistics_ts",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$enable_custom_statistics_ts == TRUE,
-                           asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_moving_average_ts",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$custom_average_ts == TRUE,
-                           asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_percentile_ts",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$custom_percentile_ts == TRUE,
-                           asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_moving_percentile_ts",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$custom_average_ts == TRUE,
-                           asis = FALSE)})
-  
+
   observe({shinyjs::toggle(id = "hidden_custom_features_ts",
                            anim = TRUE,
                            animType = "slide",
@@ -572,31 +524,7 @@ server <- function(input, output, session) {
                            selector = NULL,
                            condition = input$feature2 == "Highlight",
                            asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_custom_statistics2",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$enable_custom_statistics2 == TRUE,
-                           asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_sign_match2",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$custom_statistic2 == "% sign match",
-                           asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_SD_ratio2",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$custom_statistic2 == "SD ratio",
-                           asis = FALSE)})
-  
+
   observe({shinyjs::toggle(id = "custom_anomaly_years2",
                            anim = TRUE,
                            animType = "slide",
@@ -646,23 +574,7 @@ server <- function(input, output, session) {
                            selector = NULL,
                            condition = input$show_key_ts2 == TRUE,
                            asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_custom_statistics_ts2",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$enable_custom_statistics_ts2 == TRUE,
-                           asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_percentile_ts2",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$custom_percentile_ts2 == TRUE,
-                           asis = FALSE)})
-  
+
   observe({shinyjs::toggle(id = "hidden_custom_features_ts2",
                            anim = TRUE,
                            animType = "slide",
@@ -1088,15 +1000,7 @@ server <- function(input, output, session) {
                            selector = NULL,
                            condition = input$show_key_ts3 == TRUE,
                            asis = FALSE)})
-  
-  observe({shinyjs::toggle(id = "hidden_custom_statistics_ts3",
-                           anim = TRUE,
-                           animType = "slide",
-                           time = 0.5,
-                           selector = NULL,
-                           condition = input$enable_custom_statistics_ts3 == TRUE,
-                           asis = FALSE)})
-  
+
   observe({shinyjs::toggle(id = "hidden_moving_average_ts3",
                            anim = TRUE,
                            animType = "slide",
@@ -1180,7 +1084,6 @@ server <- function(input, output, session) {
   ####### SEA ----
   
   ###Sidebar Data
-  
   observe({shinyjs::toggle(id = "upload_sea_data_6",
                            anim = TRUE,
                            animType = "slide",
@@ -1326,7 +1229,7 @@ server <- function(input, output, session) {
                            selector = NULL,
                            condition = input$source_sea_6 == "ModE-",
                            asis = FALSE)})
-  
+
   ### ANOMALIES observe, update & interactive controls ----
   
   ####### Input updaters ----
@@ -2071,7 +1974,6 @@ server <- function(input, output, session) {
       label_rivers             = input$label_rivers,
       projection               = input$projection,
       ref_map_mode             = input$ref_map_mode,
-      sd_ratio                 = input$sd_ratio,
       show_lakes               = input$show_lakes,
       show_mountains           = input$show_mountains,
       show_rivers              = input$show_rivers,
@@ -2081,15 +1983,12 @@ server <- function(input, output, session) {
       title2_input             = input$title2_input,
       white_land               = input$white_land,
       white_ocean              = input$white_ocean,
-      custom_statistic         = input$custom_statistic,
-      enable_custom_statistics = input$enable_custom_statistics,
-      
+
       # Time series plot inputs
       axis_input_ts                = NA,
       axis_mode_ts                = NA,
       custom_ts                   = NA,
       download_options_ts         = NA,
-      enable_custom_statistics_ts = NA,
       key_position_ts             = NA,
       show_key_ts                 = NA,
       show_ticks_ts               = NA,
@@ -2209,7 +2108,6 @@ server <- function(input, output, session) {
       label_rivers             = NA,
       projection               = NA,
       ref_map_mode             = NA,
-      sd_ratio                 = NA,
       show_lakes               = NA,
       show_mountains           = NA,
       show_rivers              = NA,
@@ -2219,15 +2117,12 @@ server <- function(input, output, session) {
       title2_input             = NA,
       white_land               = NA,
       white_ocean              = NA,
-      custom_statistic         = NA,
-      enable_custom_statistics = NA,
-      
+
       # Time series plot inputs
       axis_input_ts              = input$axis_input_ts,
       axis_mode_ts               = input$axis_mode_ts,
       custom_ts                  = input$custom_ts,
       download_options_ts        = input$download_options_ts,
-      enable_custom_statistics_ts = input$enable_custom_statistics_ts,
       file_type_timeseries       = input$file_type_timeseries,
       key_position_ts            = input$key_position_ts,
       show_key_ts                = input$show_key_ts,
@@ -3094,7 +2989,6 @@ server <- function(input, output, session) {
       center_lat2               = input$center_lat2,
       center_lon2               = input$center_lon2,
       custom_map2               = input$custom_map2,
-      custom_statistic2         = input$custom_statistic2,
       custom_topo2              = input$custom_topo2,
       download_options2         = input$download_options2,
       enable_custom_statistics2 = input$enable_custom_statistics2,
@@ -3126,9 +3020,7 @@ server <- function(input, output, session) {
       custom_percentile_ts2        = NA,
       custom_ts2                   = NA,
       download_options_ts2         = NA,
-      enable_custom_statistics_ts2 = NA,
       key_position_ts2             = NA,
-      percentile_ts2               = NA,
       show_key_ts2                 = NA,
       show_ref_ts2                 = NA,
       show_ticks_ts2               = NA,
@@ -3230,7 +3122,6 @@ server <- function(input, output, session) {
       center_lat2               = NA,
       center_lon2               = NA,
       custom_map2               = NA,
-      custom_statistic2         = NA,
       custom_topo2              = NA,
       download_options2         = NA,
       enable_custom_statistics2 = NA,
@@ -3262,9 +3153,7 @@ server <- function(input, output, session) {
       custom_percentile_ts2        = input$custom_percentile_ts2,
       custom_ts2                   = input$custom_ts2,
       download_options_ts2         = input$download_options_ts2,
-      enable_custom_statistics_ts2 = input$enable_custom_statistics_ts2,
       key_position_ts2             = input$key_position_ts2,
-      percentile_ts2               = input$percentile_ts2,
       show_key_ts2                 = input$show_key_ts2,
       show_ref_ts2                 = input$show_ref_ts2,
       show_ticks_ts2               = input$show_ticks_ts2,
@@ -4562,7 +4451,6 @@ server <- function(input, output, session) {
       custom_ts3                = input$custom_ts3,
       custom_ref_ts3            = input$custom_ref_ts3,
       custom_average_ts3        = input$custom_average_ts3,
-      enable_custom_statistics_ts3 = input$enable_custom_statistics_ts3,
       download_options_ts3      = input$download_options_ts3,
       file_type_timeseries3     = input$file_type_timeseries3,
       key_position_ts3          = input$key_position_ts3,
@@ -4689,7 +4577,6 @@ server <- function(input, output, session) {
       custom_ts3                  = NA,
       custom_ref_ts3              = NA,
       custom_average_ts3          = NA,
-      enable_custom_statistics_ts3 = NA,
       download_options_ts3        = NA,
       file_type_timeseries3       = NA,
       key_position_ts3            = NA,
@@ -4697,7 +4584,6 @@ server <- function(input, output, session) {
       title_size_input_ts3        = NA,
       title1_input_ts3            = NA,
       xaxis_numeric_interval_ts3  = NA,
-      year_moving_ts3             = NA,
       add_outliers_ref_ts3        = NA,
       add_trend_ref_ts3           = NA,
       show_key_ts3                = NA,
@@ -5761,19 +5647,17 @@ server <- function(input, output, session) {
   
   # Update SD ratio data when required
   observe({
-    if ((input$ref_map_mode == "SD ratio") |
-        (input$custom_statistic == "SD ratio") |
-        (input$value_type_map_data == "SD ratio")) {
+    if (input$ref_map_mode == "SD ratio") {
       if (input$nav1 == "tab1"){ # check current tab
-        if (!identical(SDratio_data_id()[3:4],data_id_primary()[3:4])){ # check to see if currently loaded variable & month range are the same
+        if (!identical(SDratio_data_id()[3:4], data_id_primary()[3:4])) { 
+          # check to see if currently loaded variable & month range are the same
           if (data_id_primary()[1] != 0) { # check for preprocessed SD ratio data
-            new_data_id = data_id_primary()
-            new_data_id[2] = 4 # change data ID to SD ratio
+            new_data_id <- data_id_primary()
+            new_data_id[2] <- 4 # change data ID to SD ratio
             
             SDratio_data(load_preprocessed_data(data_ID = new_data_id)) # load new SD data
             SDratio_data_id(data_id_primary()) # update custom data ID
-          }
-          else{
+          } else {
             SDratio_data(load_ModE_data(dataset = "SD ratio", variable = input$variable_selected)) # load new SD data
             SDratio_data_id(data_id_primary()) # update custom data ID
           }
@@ -5782,28 +5666,26 @@ server <- function(input, output, session) {
     }
   })
   
-  # Processed SD data
-  SDratio_subset = reactive({
-    req(input$nav1 == "tab1") # Only run code if in the current tab
-    
-    req(((input$ref_map_mode == "SD ratio") |
-           (input$custom_statistic == "SD ratio") |
-           (input$value_type_map_data == "SD ratio")))
+  SDratio_subset <- reactive({
+    req(input$nav1 == "tab1")             
+    req(input$ref_map_mode == "SD ratio") 
     
     create_sdratio_data(
-      data_input = SDratio_data(),
-      data_ID = data_id_primary(),
-      tab = "general",
-      variable = input$variable_selected,
-      subset_lon_IDs = subset_lons_primary(),
-      subset_lat_IDs = subset_lats_primary(),
-      month_range = month_range_primary(),
-      year_range = input$range_years
+      data_input      = SDratio_data(),
+      data_ID         = data_id_primary(),
+      tab             = "general",  # oder "reference", falls du dafür einen eigenen Modus hast
+      variable        = input$variable_selected,
+      subset_lon_IDs  = subset_lons_primary(),
+      subset_lat_IDs  = subset_lats_primary(),
+      month_range     = month_range_primary(),
+      year_range      = input$range_years
     )
   })
   
-  ####### Plotting ----
   
+  
+  
+  ####### Plotting ----
   # Map customization (statistics and map titles)
   
   plot_titles <- reactive({
@@ -5870,21 +5752,6 @@ server <- function(input, output, session) {
     })
   })
   
-  # Anomalies Statistics
-  map_statistics = reactive({
-    req(input$nav1 == "tab1") # Only run code if in the current tab
-    my_stats = create_stat_highlights_data(
-      data_input = data_output4_primary(),
-      sd_data = SDratio_subset(),
-      stat_highlight = input$custom_statistic,
-      sdratio = input$sd_ratio,
-      percent = NA,
-      subset_lon_IDs = subset_lons_primary(),
-      subset_lat_IDs = subset_lats_primary()
-    )
-    return(my_stats)
-  })
-  
   #Plotting the Data (Maps)
   map_data <- function() {
     create_map_datatable(
@@ -5933,7 +5800,8 @@ server <- function(input, output, session) {
     )
     return(m_d)
   })
-  
+
+
   map_plot <- function() {
     validate(
       need(
@@ -5962,8 +5830,7 @@ server <- function(input, output, session) {
       
       points_data          = map_points_data(),
       highlights_data      = map_highlights_data(),
-      stat_highlights_data = map_statistics(),
-      
+
       c_borders            = input$hide_borders,
       white_ocean          = input$white_ocean,
       white_land           = input$white_land,
@@ -5985,8 +5852,9 @@ server <- function(input, output, session) {
       label_mountains      = input$label_mountains
     )
   }
+ 
   
-  ###### Cached Plot 
+   ###### Cached Plot 
   output$map <- renderCachedPlot({
     req(map_dimensions()[1], map_dimensions()[2])
     map_plot()
@@ -5996,8 +5864,7 @@ server <- function(input, output, session) {
   cacheKeyExpr = {
     points_key     <- tryCatch(overlay_key(map_points_data()),     error = function(e) "")
     highlights_key <- tryCatch(overlay_key(map_highlights_data()), error = function(e) "")
-    stats_key      <- tryCatch(overlay_key(map_statistics()),      error = function(e) "")
-    
+
     shpfile_key <- tryCatch({
       f <- input$shpFile
       if (is.null(f)) "no-upload" else paste(
@@ -6028,12 +5895,6 @@ server <- function(input, output, session) {
     plotorder_key <- tryCatch(digest::digest(plotOrder()), error = function(e) "")
     shp_color_key <- tryCatch(digest::digest(shp_color_inputs()), error = function(e) "")
     
-    sd_ratio_key <- if (identical(input$custom_statistic, "SD ratio")) {
-      round(as.numeric(input$sd_ratio %||% NA_real_), 4)
-    } else {
-      NA_real_
-    }
-    
     months_key <- tryCatch({
       if (identical(input$season_selected, "Custom")) {
         paste(input$range_months %||% character(0), collapse = "->")
@@ -6063,7 +5924,6 @@ server <- function(input, output, session) {
       input$hide_axis,
       points_key,
       highlights_key,
-      stats_key,
       shpfile_key,
       plotorder_key,
       shp_ids_key,
@@ -6089,14 +5949,11 @@ server <- function(input, output, session) {
       input$title1_input_ts,
       input$title_size_input,
       input$title_size_input_ts,
-      input$custom_statistic,
-      months_key,
-      sd_ratio_key
+      months_key
     )
   },
   width  = function() { map_dimensions()[1] },
   height = function() { map_dimensions()[2] })
-  
   
   # Disable Grey land and Grey ocean for the Orthographic and LAEA projections
   allowed_projs <- c("UTM (default)", "Robinson")
@@ -6228,48 +6085,43 @@ server <- function(input, output, session) {
   })
   
   
-  #Plotting the data (timeseries)
+  # Plotting the data (timeseries)
   timeseries_data <- reactive({
     req(input$nav1 == "tab1") # Only run code if in the current tab
     
-    #Plot normal timeseries if year range is > 1 year
+    # Plot normal timeseries if year range is > 1 year
     if (input$range_years[1] != input$range_years[2]) {
-      ts_data1 <- create_timeseries_datatable(
-        data_input = data_output4_primary(),
-        year_input = input$range_years,
+      ts_data <- create_timeseries_datatable(
+        data_input      = data_output4_primary(),
+        year_input      = input$range_years,
         year_input_type = "range",
-        subset_lon_IDs = subset_lons_primary(),
-        subset_lat_IDs = subset_lats_primary()
+        subset_lon_IDs  = subset_lons_primary(),
+        subset_lat_IDs  = subset_lats_primary()
       )
-      ts_data2 = add_stats_to_TS_datatable(
-        data_input = ts_data1,
-        add_moving_average = input$custom_average_ts,
-        moving_average_range = input$year_moving_ts,
-        moving_average_alignment = "center",
-        add_percentiles = input$custom_percentile_ts,
-        percentiles = input$percentile_ts,
-        use_MA_percentiles = input$moving_percentile_ts
-      )
-    }
-    # Plot monthly TS if year range = 1 year
-    else {
-      ts_data1 = load_ModE_data(dataset = input$dataset_selected,
-                                variable = input$variable_selected)
       
-      ts_data2 = create_monthly_TS_data(
-        data_input = ts_data1,
-        dataset = input$dataset_selected,
-        variable = input$variable_selected,
-        years = input$range_years[1],
-        lon_range = input$range_longitude,
-        lat_range = input$range_latitude,
-        mode = "Anomaly",
-        type = "Individual years",
+    } else {
+      # Plot monthly TS if year range = 1 year
+      ts_raw <- load_ModE_data(
+        dataset  = input$dataset_selected,
+        variable = input$variable_selected
+      )
+      
+      ts_data <- create_monthly_TS_data(
+        data_input     = ts_raw,
+        dataset        = input$dataset_selected,
+        variable       = input$variable_selected,
+        years          = input$range_years[1],
+        lon_range      = input$range_longitude,
+        lat_range      = input$range_latitude,
+        mode           = "Anomaly",
+        type           = "Individual years",
         baseline_range = input$ref_period
       )
     }
-    return(ts_data2)
+    
+    ts_data
   })
+  
   
   timeseries_data_output = reactive({
     req(input$nav1 == "tab1") # Only run code if in the current tab
@@ -6631,46 +6483,54 @@ server <- function(input, output, session) {
   
   ####### SD Ratio data ----
   
-  # Update SD ratio data when required
+  ####### SD Ratio data ----
+  
+  # Update SD ratio data when required (Tab 2)
   observe({
-    if((input$ref_map_mode2 == "SD ratio")|(input$custom_statistic2 == "SD ratio")){
-      if (input$nav1 == "tab2"){ # check current tab
-        if (!identical(SDratio_data_id()[3:4],data_id_primary()[3:4])){ # check to see if currently loaded variable & month range are the same
-          if (data_id_primary()[1] != 0) { # check for preprocessed SD ratio data
-            new_data_id = data_id_primary()
-            new_data_id[2] = 4 # change data ID to SD ratio
+    if ((input$ref_map_mode2 == "SD ratio") ||
+        (input$value_type_map_data2 == "SD ratio")) {
+      
+      if (input$nav1 == "tab2") { # check current tab
+        
+        # check if currently loaded variable & month range are the same
+        if (!identical(SDratio_data_id()[3:4], data_id_primary()[3:4])) {
+          
+          if (data_id_primary()[1] != 0) { # preprocessed SD ratio data vorhanden
+            new_data_id <- data_id_primary()
+            new_data_id[2] <- 4 # change data ID to SD ratio
             
             SDratio_data(load_preprocessed_data(data_ID = new_data_id)) # load new SD data
             SDratio_data_id(data_id_primary()) # update custom data ID
-          }
-          else{
-            SDratio_data(load_ModE_data(dataset = "SD ratio", variable = input$variable_selected2)) # load new SD data
+            
+          } else {
+            SDratio_data(load_ModE_data(dataset = "SD ratio",
+                                        variable = input$variable_selected2)) # load new SD data
             SDratio_data_id(data_id_primary()) # update custom data ID
           }
-        } 
+        }
       }
     }
   })
   
-  # Processed SD data
-  SDratio_subset_2 = reactive({
+  # Processed SD data for Tab 2
+  SDratio_subset_2 <- reactive({
     req(input$nav1 == "tab2") # Only run code if in the current tab
     
-    req(((input$ref_map_mode2 == "SD ratio") |
-           (input$custom_statistic2 == "SD ratio")
-    ))
+    req((input$ref_map_mode2 == "SD ratio") ||
+          (input$value_type_map_data2 == "SD ratio"))
     
     create_sdratio_data(
-      data_input = SDratio_data(),
-      data_ID = data_id_primary(),
-      tab = "composites",
-      variable = input$variable_selected2,
+      data_input     = SDratio_data(),
+      data_ID        = data_id_primary(),
+      tab            = "composites",
+      variable       = input$variable_selected2,
       subset_lon_IDs = subset_lons_primary(),
       subset_lat_IDs = subset_lats_primary(),
-      month_range = month_range_primary(),
-      year_range = year_set_comp()
+      month_range    = month_range_primary(),
+      year_range     = year_set_comp()
     )
   })
+  
   
   ####### Plotting ----
   
@@ -6736,24 +6596,7 @@ server <- function(input, output, session) {
       updateTextInput(session, "title1_input_ts2", value = plot_titles_composites()$ts_title)
     })
   })
-  
-  # Composite statistics
-  
-  map_statistics_2 = reactive({
-    req(input$nav1 == "tab2") # Only run code if in the current tab
-    
-    my_stats = create_stat_highlights_data(
-      data_input = data_output4_primary(),
-      sd_data = SDratio_subset_2(),
-      stat_highlight = input$custom_statistic2,
-      sdratio = input$sd_ratio2,
-      percent = input$percentage_sign_match2,
-      subset_lon_IDs = subset_lons_primary(),
-      subset_lat_IDs = subset_lats_primary()
-    )
-    
-    return(my_stats)
-  })
+
   
   #Plotting the Data (Maps)
   map_data_2 <- function() {
@@ -6829,8 +6672,7 @@ server <- function(input, output, session) {
       
       points_data          = map_points_data2(),
       highlights_data      = map_highlights_data2(),
-      stat_highlights_data = map_statistics_2(),
-      
+
       c_borders            = input$hide_borders2,
       white_ocean          = input$white_ocean2,
       white_land           = input$white_land2,
@@ -6861,7 +6703,6 @@ server <- function(input, output, session) {
   cacheKeyExpr = {
     points_key2     <- tryCatch(overlay_key(map_points_data2()),     error = function(e) "")
     highlights_key2 <- tryCatch(overlay_key(map_highlights_data2()), error = function(e) "")
-    stats_key2      <- tryCatch(overlay_key(map_statistics_2()),     error = function(e) "")
     
     shpfile_key2 <- tryCatch({
       f <- input$shpFile2
@@ -6892,12 +6733,6 @@ server <- function(input, output, session) {
     
     plotorder_key2 <- tryCatch(digest::digest(plotOrder2()), error = function(e) "")
     
-    sd_ratio_key2 <- if (identical(input$custom_statistic2, "SD ratio")) {
-      round(as.numeric(input$sd_ratio2 %||% NA_real_), 4)
-    } else {
-      NA_real_
-    }
-    
     months_key2 <- tryCatch({
       if (identical(input$season_selected2, "Custom")) {
         paste(input$range_months2 %||% character(0), collapse = "->")
@@ -6922,7 +6757,6 @@ server <- function(input, output, session) {
       input$hide_axis2,
       points_key2,
       highlights_key2,
-      stats_key2,
       shpfile_key2,
       plotorder_key2,
       shp_ids_key2,
@@ -6949,9 +6783,7 @@ server <- function(input, output, session) {
       input$title1_input_ts2,
       input$title_size_input2,
       input$title_size_input_ts2,
-      input$custom_statistic2,
       months_key2,
-      sd_ratio_key2,
       input$upload_file2,
       input$enter_upload2,
       input$enter_upload2a,
@@ -6961,6 +6793,7 @@ server <- function(input, output, session) {
   width  = function() map_dimensions_2()[1],
   height = function() map_dimensions_2()[2]
   )
+  
   
   # Disable Grey land and Grey ocean for the Orthographic and LAEA projections
   allowed_projs <- c("UTM (default)", "Robinson")
@@ -7097,54 +6930,51 @@ server <- function(input, output, session) {
     
     req(input$nav1 == "tab2") # Only run code if in the current tab
     
-    #Plot normal timeseries if year set is > 1 year
+    # Plot normal timeseries if year set is > 1 year
     if (length(year_set_comp()) > 1) {
-      ts_data1 <- create_timeseries_datatable(
-        data_input = data_output4_primary(),
-        year_input = year_set_comp(),
-        year_input_type = "set",
-        subset_lon_IDs = subset_lons_primary(),
-        subset_lat_IDs = subset_lats_primary()
+      ts_data <- create_timeseries_datatable(
+        data_input        = data_output4_primary(),
+        year_input        = year_set_comp(),
+        year_input_type   = "set",
+        subset_lon_IDs    = subset_lons_primary(),
+        subset_lat_IDs    = subset_lats_primary()
       )
-      ts_data2 = add_stats_to_TS_datatable(
-        data_input = ts_data1,
-        add_moving_average = FALSE,
-        moving_average_range = NA,
-        moving_average_alignment = NA,
-        add_percentiles = input$custom_percentile_ts2,
-        percentiles = input$percentile_ts2,
-        use_MA_percentiles = FALSE
+      
+    } else {
+      # Plot monthly TS if year range = 1 year
+      ts_raw <- load_ModE_data(
+        dataset  = input$dataset_selected2,
+        variable = input$variable_selected2
       )
-    } 
-    # Plot monthly TS if year range = 1 year
-    else {
-      ts_data1 = load_ModE_data(dataset = input$dataset_selected2,
-                                variable = input$variable_selected2)
       
       # Generate ref years
       if (input$mode_selected2 == "Fixed reference") {
-        ref_years = input$ref_period2
+        ref_years <- input$ref_period2
       } else if (input$mode_selected2 == "X years prior") {
-        ref_years = c((year_set_comp() - input$prior_years2), year_set_comp() -
-                        1)
+        ref_years <- c(
+          (year_set_comp() - input$prior_years2),
+          year_set_comp() - 1
+        )
       } else {
-        ref_years = year_set_comp_ref()
+        ref_years <- year_set_comp_ref()
       }
       
-      ts_data2 = create_monthly_TS_data(
-        data_input = ts_data1,
-        dataset = input$dataset_selected2,
-        variable = input$variable_selected2,
-        years = year_set_comp(),
-        lon_range = input$range_longitude2,
-        lat_range = input$range_latitude2,
-        mode = "Anomaly",
-        type = "Individual years",
+      ts_data <- create_monthly_TS_data(
+        data_input     = ts_raw,
+        dataset        = input$dataset_selected2,
+        variable       = input$variable_selected2,
+        years          = year_set_comp(),
+        lon_range      = input$range_longitude2,
+        lat_range      = input$range_latitude2,
+        mode           = "Anomaly",
+        type           = "Individual years",
         baseline_range = ref_years
       )
     }
-    return(ts_data2)
+    
+    ts_data
   })
+  
   
   timeseries_data_output_2 = reactive({
     req(input$nav1 == "tab2") # Only run code if in the current tab
@@ -7883,19 +7713,9 @@ server <- function(input, output, session) {
     } else {
       tsd_v1 = user_subset_v1()
     }
+
     
-    # Add moving averages (if chosen)
-    tsds_v1 = add_stats_to_TS_datatable(
-      data_input = tsd_v1,
-      add_moving_average = input$custom_average_ts3,
-      moving_average_range = input$year_moving_ts3,
-      moving_average_alignment = "center",
-      add_percentiles = FALSE,
-      percentiles = NA,
-      use_MA_percentiles = FALSE
-    )
-    
-    return(tsds_v1)
+    return(tsd_v1)
   })
   
   ts_data_v2 = reactive({
@@ -7907,19 +7727,9 @@ server <- function(input, output, session) {
     } else {
       tsd_v2 = user_subset_v2()
     } 
+
     
-    # Add moving averages (if chosen)
-    tsds_v2 = add_stats_to_TS_datatable(
-      data_input = tsd_v2,
-      add_moving_average = input$custom_average_ts3,
-      moving_average_range = input$year_moving_ts3,
-      moving_average_alignment = "center",
-      add_percentiles = FALSE,
-      percentiles = NA,
-      use_MA_percentiles = FALSE
-    )
-    
-    return(tsds_v2)
+    return(tsd_v2)
   })
   
   # Correlate timeseries
@@ -9513,7 +9323,6 @@ server <- function(input, output, session) {
   updateNumericInputRange1("percentage_sign_match2", 1, 100)
   updateNumericInputRange1("sample_size_6", 100, 100000000000)
   
-  updateNumericInputRange1("sd_ratio", 0, 1)
   updateNumericInputRange1("sd_ratio2", 0, 1)
   updateNumericInputRange1("sd_input_ref_ts3", 1, 10)
   updateNumericInputRange1("trend_sd_input_ref_ts3", 1, 10)

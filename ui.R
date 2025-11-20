@@ -430,7 +430,8 @@ ui <- navbarPage(
                                     h5(helpText("To access all functionalities of ClimeApp, download the offline version. The offline version includes the following additional features:")),
                                     tags$ul(
                                       tags$li("Regression analysis"),
-                                      tags$li("Annual cycle analysis")
+                                      tags$li("Annual cycle analysis"),
+                                      tags$li("Custom statistics (SD ratio, % sign match")
                                     ),
                                     br(),
                                     downloadButton("climeapp_desktop_download",
@@ -1058,34 +1059,6 @@ ui <- navbarPage(
                                                            ))
                                                      )),
                                               
-                                              #### Custom statistics ----
-                                              column(width = 4,
-                                                     h4("Custom statistics", style = "color: #094030;",map_statistics_popover("pop_anomalies_mapstat")),
-                                                     
-                                                     checkboxInput(inputId = "enable_custom_statistics",
-                                                                   label   = "Enable custom statistics",
-                                                                   value   = FALSE),
-                                                     
-                                                     
-                                                     div(id = "hidden_custom_statistics",
-                                                         h4(helpText("Choose custom statistic:",map_choose_statistic_popover("pop_anomalies_choosestat"))),
-                                                         
-                                                         radioButtons(inputId      = "custom_statistic",
-                                                                      label        = NULL,
-                                                                      inline       = TRUE,
-                                                                      choices      = c("None","SD ratio")),
-                                                         
-                                                         div(id = "hidden_SD_ratio",  
-                                                             numericInput(inputId = "sd_ratio",
-                                                                          label  = "SD ratio < ",
-                                                                          value  = 0.2,
-                                                                          min    = 0,
-                                                                          max    = 1,
-                                                                          step   = 0.1,
-                                                                          updateOn = "blur")
-                                                         ),
-                                                     ),
-                                              ),
                                               
                                               #### Customization panels END ----
                                             ),
@@ -1405,54 +1378,7 @@ ui <- navbarPage(
                                                              ))
                                                        ))),
                                               
-                                              #### Custom statistics ----
-                                              column(width = 4,
-                                                     h4("Custom statistics", style = "color: #094030;",timeseries_statistics_popover("pop_anomalies_timestats")),
-                                                     
-                                                     checkboxInput(inputId = "enable_custom_statistics_ts",
-                                                                   label   = "Enable custom statistics",
-                                                                   value   = FALSE),
-                                                     
-                                                     shinyjs::hidden(
-                                                       div(id = "hidden_custom_statistics_ts",
-                                                           
-                                                           checkboxInput(inputId = "custom_average_ts",
-                                                                         label = "Add a moving average",
-                                                                         value = FALSE),
-                                                           
-                                                           shinyjs::hidden(
-                                                             div(id = "hidden_moving_average_ts",  
-                                                                 numericInput(inputId = "year_moving_ts",
-                                                                              label  = "Year moving average, centred:",
-                                                                              value  = 11,
-                                                                              min    = 3,
-                                                                              max    = 30,
-                                                                              updateOn = "blur"),
-                                                                 
-                                                             )),
-                                                           
-                                                           checkboxInput(inputId = "custom_percentile_ts",
-                                                                         label   = "Add percentiles",
-                                                                         value   = FALSE),
-                                                           
-                                                           shinyjs::hidden(
-                                                             div(id = "hidden_percentile_ts",
-                                                                 radioButtons(inputId   = "percentile_ts",
-                                                                              label    = NULL,
-                                                                              choices  = c("0.9", "0.95", "0.99"),
-                                                                              selected = "0.99",
-                                                                              inline   = TRUE),
-                                                                 
-                                                                 shinyjs::hidden(
-                                                                   div(id = "hidden_moving_percentile_ts",
-                                                                       checkboxInput(inputId = "moving_percentile_ts",
-                                                                                     label   = "Use moving average for percentile",
-                                                                                     value   = FALSE)))
-                                                                 
-                                                             ))
-                                                       )),
-                                              ),
-                                              
+
                                               #### Customization panels END ----
                                             ),
                                             #### Downloads TS ----
@@ -2140,46 +2066,7 @@ ui <- navbarPage(
                                                        )),
                                               ),
                                               
-                                              #### Custom statistics ----
-                                              column(width = 4,
-                                                     
-                                                     h4("Custom statistics", style = "color: #094030;",map_statistics_popover("pop_composites_mapstat")),
-                                                     
-                                                     checkboxInput(inputId = "enable_custom_statistics2",
-                                                                   label   = "Enable custom statistics",
-                                                                   value   = FALSE),
-                                                     
-                                                     shinyjs::hidden(
-                                                       div(id = "hidden_custom_statistics2",
-                                                           
-                                                           h4(helpText("Choose custom statistic:",map_choose_statistic_popover("pop_composites_choosestat"))),
-                                                           
-                                                           radioButtons(inputId      = "custom_statistic2",
-                                                                        label        = NULL,
-                                                                        inline       = TRUE,
-                                                                        choices      = c("None","SD ratio","% sign match")),
-                                                           
-                                                           div(id = "hidden_sign_match2",  
-                                                               numericInput(inputId = "percentage_sign_match2",
-                                                                            label  = "% of years in range with matching sign:",
-                                                                            value  = 90,
-                                                                            min    = 1,
-                                                                            max    = 100,
-                                                                            updateOn = "blur")
-                                                           ),
-                                                           
-                                                           div(id = "hidden_SD_ratio2",  
-                                                               numericInput(inputId = "sd_ratio2",
-                                                                            label  = "SD ratio < ",
-                                                                            value  = 0.2,
-                                                                            min    = 0,
-                                                                            max    = 1,
-                                                                            step = 0.1,
-                                                                            updateOn = "blur")
-                                                           ),
-                                                           
-                                                       )),
-                                              ),
+                                             
                                               #### Customization panels END ----
                                             ),
                                             
@@ -2500,34 +2387,7 @@ ui <- navbarPage(
                                                                  )
                                                              ))
                                                        ))),
-                                              
-                                              #### Custom statistics ----
-                                              column(width = 4,
-                                                     
-                                                     h4("Custom statistics", style = "color: #094030;", timeseries_statistics_popover("pop_composites_timestats")),
-                                                     
-                                                     checkboxInput(inputId = "enable_custom_statistics_ts2",
-                                                                   label   = "Enable custom statistics",
-                                                                   value   = FALSE),
-                                                     
-                                                     shinyjs::hidden(
-                                                       div(id = "hidden_custom_statistics_ts2",
-                                                           
-                                                           checkboxInput(inputId = "custom_percentile_ts2",
-                                                                         label   = "Add percentiles",
-                                                                         value   = FALSE),
-                                                           
-                                                           shinyjs::hidden(
-                                                             div(id = "hidden_percentile_ts2",
-                                                                 radioButtons(inputId   = "percentile_ts2",
-                                                                              label    = NULL,
-                                                                              choices  = c("0.9", "0.95", "0.99"),
-                                                                              selected = "0.99",
-                                                                              inline   = TRUE),
-                                                             ))
-                                                       )),
-                                              ),
-                                              
+
                                               #### Customization panels END ----
                                             ),
                                             
@@ -3878,35 +3738,6 @@ ui <- navbarPage(
                                                                  )
                                                              ))
                                                        ))),
-                                              
-                                              #### Custom statistics ----
-                                              column(width = 4,
-                                                     
-                                                     h4("Custom statistics", style = "color: #094030;", timeseries_statistics_popover("pop_correlation_timestats")),
-                                                     
-                                                     checkboxInput(inputId = "enable_custom_statistics_ts3",
-                                                                   label   = "Enable custom statistics",
-                                                                   value   = FALSE),
-                                                     
-                                                     shinyjs::hidden(
-                                                       div(id = "hidden_custom_statistics_ts3",
-                                                           
-                                                           checkboxInput(inputId = "custom_average_ts3",
-                                                                         label = "Add a moving averages",
-                                                                         value = FALSE),
-                                                           
-                                                           shinyjs::hidden(
-                                                             div(id = "hidden_moving_average_ts3",  
-                                                                 numericInput(inputId = "year_moving_ts3",
-                                                                              label  = "Year moving average, centred:",
-                                                                              value  = 11,
-                                                                              min    = 3,
-                                                                              max    = 30,
-                                                                              updateOn = "blur"),
-                                                             )),
-                                                           
-                                                       )),
-                                              ),
                                               
                                               #### Customization panels END ----
                                             ),

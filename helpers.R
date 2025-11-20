@@ -1,5 +1,4 @@
 # Helper Functions of ClimeApp 
-
 #### Caching helpers for maps ####
 # Use ragg for crisp text/lines in Shiny plots
 options(shiny.useragg = TRUE)
@@ -531,7 +530,6 @@ generate_data_ID = function(dataset,
 #' @param variable Character. Name of variable. One of `"Temperature"`, `"Precipitation"`, `"SLP"`, `"Z500"`.
 #'
 #' @return 3D numeric array (lon × lat × time) containing the full ModE dataset for the selected variable.
-
 load_ModE_data = function(dataset,
                           variable){
   # Mod E-RA
@@ -1561,6 +1559,8 @@ set_ts_axis_values = function(data_input) {
 #   return(p)
 # }
 
+
+
 plot_map <- function(data_input,
                      lon_lat_range,
                      variable = NULL,
@@ -1660,41 +1660,7 @@ plot_map <- function(data_input,
     }
   }
   
-  # # --- Disable pre-plot clipping to avoid seams/missing geometry ---
-  # crop_sf <- function(x) x
-  
-  # --- Light clipping for speed (keeps smooth rendering, no seams) ---
-  # crop_sf <- function(x) {
-  #   if (is.null(x) || nrow(x) == 0) return(x)
-  #   
-  #   # Determine current visible extent
-  #   lon_min <- lon_lat_range[1]; lon_max <- lon_lat_range[2]
-  #   lat_min <- lon_lat_range[3]; lat_max <- lon_lat_range[4]
-  #   lon_span <- abs(lon_max - lon_min); lat_span <- abs(lat_max - lat_min)
-  #   
-  #   # Skip cropping for world-wide or non-UTM projections
-  #   if (!identical(projection, "UTM (default)") ||
-  #       lon_span >= 100 || lat_span >= 70) {
-  #     return(x)
-  #   }
-  #   
-  #   # Compute a slightly padded bounding box (to avoid edge cuts)
-  #   pad <- 2.0
-  #   bb <- sf::st_bbox(c(
-  #     xmin = lon_min - pad, xmax = lon_max + pad,
-  #     ymin = lat_min - pad, ymax = lat_max + pad
-  #   ), crs = sf::st_crs(4326))
-  #   
-  #   # Crop safely in planar mode
-  #   old_s2 <- sf::sf_use_s2()
-  #   on.exit(sf::sf_use_s2(old_s2), add = TRUE)
-  #   sf::sf_use_s2(FALSE)
-  #   
-  #   suppressWarnings(tryCatch(sf::st_crop(x, bb), error = function(e) x))
-  # }
-  
-  ## Let's Test THIS ## !!!!!!!!!!!!!!!!!!!!!!
-  
+
   # ---- Smart, artifact-safe clipping & simplification ----
   
   .should_clip <- function(lon_lat_range, projection) {
@@ -1771,15 +1737,20 @@ plot_map <- function(data_input,
     
     g
   }
-  
-  ## Let's Test THIS ## !!!!!!!!!!!!!!!!!!!!!! UP HERE ^
+
+  r <- data_input
+  if (terra::ncell(r) > 3e5) {          
+    r <- terra::aggregate(r, fact = 3) 
+  }
   
   p <- ggplot() +
-    # behalten: gefüllte Konturen (wie zuvor; optisch identisch)
     tidyterra::geom_spatraster_contour_filled(
-      data = data_input, aes(fill = after_stat(level_mid)), bins = 20
+      data = r,                           
+      aes(fill = after_stat(level_mid)),
+      bins = 20                          
     ) +
     labs(fill = v_unit)
+  
   
   # --- Guides nur bauen, wenn nicht versteckt; sichere Größen verwenden ---
   if (isTRUE(hide_axis)) {
@@ -1949,7 +1920,7 @@ plot_map <- function(data_input,
     xlim_cur <- get_range(pp, "x")
     ylim_cur <- get_range(pp, "y")
     
-    # ggf. Projection transform (wie zuvor)
+    # Projection transform
     if (projection != "UTM (default)") {
       points_data <- transform_points_df(
         df = points_data,
@@ -1985,7 +1956,7 @@ plot_map <- function(data_input,
     }
   }
   
-  # --- stat highlights / boxes (wie zuvor) ---
+  # --- stat highlights / boxes ---
   if (nrow(stat_highlights_data) > 0) {
     filtered_stat_highlights_data <- subset(stat_highlights_data, criteria_vals == 1)
     if (nrow(filtered_stat_highlights_data) > 0) {
@@ -2043,7 +2014,6 @@ plot_map <- function(data_input,
 }
 
 `%||%` <- function(a, b) if (!is.null(a)) a else b
-
 
 #' (General) CREATE MAP DATATABLE
 #' 
@@ -8359,3 +8329,4 @@ read_sea_data <- function(data_input_manual,
   
   return(df)
 }
+

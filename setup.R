@@ -1,3 +1,4 @@
+t <- system.time({
 #### Setup script for ClimeApp ####
 # Sets up user environment and loads required libraries as well as preprocessed data
 
@@ -274,3 +275,6 @@ mountains <- readRDS("data/geodata_custom_maps/mountains.rds")
 rivers <- readRDS("data/geodata_custom_maps/rivers.rds")
 })
 message("system.time custom layers = ", paste(t, collapse = " / "))
+
+})
+message("system.time setup.R = ", paste(t, collapse = " / "))
