@@ -5791,6 +5791,8 @@ server <- function(input, output, session) {
   #Plotting the Map
   map_dimensions <- reactive({
     req(input$nav1 == "tab1") # Only run code if in the current tab
+    req(!is.null(session$clientData$output_map_width))
+    
     m_d = generate_map_dimensions(
       subset_lon_IDs = subset_lons_primary(),
       subset_lat_IDs = subset_lats_primary(),
@@ -5903,8 +5905,7 @@ server <- function(input, output, session) {
       }
     }, error = function(e) "no-months")
     
-    dim_key <- paste0(map_dimensions()[1], "x", map_dimensions()[2])
-    
+
     titles_key <- tryCatch({
       digest::digest(plot_titles())
     }, error = function(e) "")
@@ -5929,7 +5930,6 @@ server <- function(input, output, session) {
       shp_ids_key,
       shp_style_key,
       shp_color_key,
-      dim_key,
       input$hide_borders,
       input$white_ocean,
       input$white_land,

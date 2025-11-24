@@ -1,4 +1,3 @@
-t <- system.time({
 #### Setup script for ClimeApp ####
 # Sets up user environment and loads required libraries as well as preprocessed data
 
@@ -80,8 +79,7 @@ setup_user_environment()
 # lib_path <- "/home/ClimeApp/R-packages"
 
 # Load only REQUIRED functions/libraries:
-t <- system.time({
-  
+
   # Load only REQUIRED functions/libraries:
   #Packages
   
@@ -123,9 +121,6 @@ t <- system.time({
   # library(leaflet.providers, lib.loc = lib_path)
   # library(zoo, lib.loc = lib_path)
   # library(tidyterra, lib.loc = lib_path)
-  # library(plotly, lib.loc = lib_path)
-})
-message("system.time libraries = ", paste(t, collapse = " / "))
 
 #### Design ----
 
@@ -152,7 +147,6 @@ spinner_width = 310
 spinner_height = 200
 
 #### Preprocseeing ----
-t <- system.time({
 # Load pre-processed data
 annual_temp_nc = ncdf4::nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_year.nc")
 DJF_temp_nc = ncdf4::nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_djf.nc")
@@ -221,8 +215,6 @@ ncdf4::nc_close(SON_prec_nc)
 # ncdf4::nc_close(MAM_slp_nc)
 # ncdf4::nc_close(JJA_slp_nc)
 # ncdf4::nc_close(SON_slp_nc)
-})
-message("system.time data = ", paste(t, collapse = " / "))
 
 ## Create dataframe of continent lon/lats and Set initial latlon values
 Europe = c(-30,40,30,75) 
@@ -256,7 +248,6 @@ random_century = sample(1:6,1)
 initial_year_values = century_years[,random_century]
 
 
-t <- system.time({
 ## Load grid square weights for calculating means
 latlon_weights = as.matrix(read.csv("data/latlon_weights.csv"))
 
@@ -275,6 +266,5 @@ land <- readRDS("data/geodata_maps/land.rds")
 lakes <- readRDS("data/geodata_custom_maps/lakes.rds")
 mountains <- readRDS("data/geodata_custom_maps/mountains.rds")
 rivers <- readRDS("data/geodata_custom_maps/rivers.rds")
-})
-message("system.time custom layers = ", paste(t, collapse = " / "))
+
 
