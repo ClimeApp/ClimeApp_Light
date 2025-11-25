@@ -89,8 +89,8 @@ t <- system.time({
   library(htmltools, lib.loc = lib_path)
   library(terra, lib.loc = lib_path)
   
-  #library(shinyWidgets, lib.loc = lib_path)
-  #library(RColorBrewer, lib.loc = lib_path)
+  # library(shinyWidgets, lib.loc = lib_path)
+  # library(RColorBrewer, lib.loc = lib_path)
   # library(shinyjs, lib.loc = lib_path)
   # library(bslib, lib.loc = lib_path)
   # library(readxl, lib.loc = lib_path)
@@ -130,6 +130,7 @@ message("system.time libraries = ", paste(t, collapse = " / "))
 
 # Source for images
 addResourcePath(prefix = 'pics', directoryPath = "www")
+addResourcePath(prefix = 'videos', directoryPath = "videos")
 
 # Choosing theme and making colouring changes
 #my_theme <- bslib::bs_theme(version = 5, bootswatch = "united", primary = "#094030")
