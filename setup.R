@@ -166,6 +166,16 @@ spinner_height = 200
 ##   season IDs: 1=DJF, 2=MAM, 3=JJA, 4=SON, 5=annual)
 ##   variable IDs: 1=temp, 2=prec, 3=SLP, 4=Z500)
 
+grid_nc <- ncdf4::nc_open(
+  "data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_temp2_abs_1421-2008_year.nc"
+)
+
+lon <- grid_nc$dim[[3]]$vals  # longitudes
+lat <- grid_nc$dim[[4]]$vals  # latitudes
+
+ncdf4::nc_close(grid_nc)
+
+
 ## Create dataframe of continent lon/lats and Set initial latlon values
 Europe = c(-30,40,30,75) 
 Asia = c(25,170,5,80)
