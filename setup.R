@@ -160,12 +160,6 @@ MAM_prec_nc = ncdf4::nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1
 JJA_prec_nc = ncdf4::nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_jja.nc")
 SON_prec_nc = ncdf4::nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_totprec_abs_1421-2008_son.nc")
 
-# annual_slp_nc = ncdf4::nc_open("data/ModE-RA/year/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_year.nc")
-# DJF_slp_nc = ncdf4::nc_open("data/ModE-RA/djf/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_djf.nc")
-# MAM_slp_nc = ncdf4::nc_open("data/ModE-RA/mam/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_mam.nc")
-# JJA_slp_nc = ncdf4::nc_open("data/ModE-RA/jja/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_jja.nc")
-# SON_slp_nc = ncdf4::nc_open("data/ModE-RA/son/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_slp_abs_1421-2008_son.nc")
-
 ## Create dataframe of preprocessed yearly variables
 ## - pp_data[[season]][[variable]] where
 ##   season IDs: 1=DJF, 2=MAM, 3=JJA, 4=SON, 5=annual)
@@ -175,23 +169,18 @@ pp_data = list(vector("list", 4),vector("list", 4),vector("list", 4),vector("lis
 
 pp_data[[5]][[1]] = ncdf4::ncvar_get(annual_temp_nc,varid="temp2")-273.15
 pp_data[[5]][[2]] = ncdf4::ncvar_get(annual_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[5]][[3]] = ncdf4::ncvar_get(annual_slp_nc,varid="slp")/100
 
 pp_data[[1]][[1]] = ncdf4::ncvar_get(DJF_temp_nc,varid="temp2")-273.15
 pp_data[[1]][[2]] = ncdf4::ncvar_get(DJF_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[1]][[3]] = ncdf4::ncvar_get(DJF_slp_nc,varid="slp")/100
 
 pp_data[[2]][[1]] = ncdf4::ncvar_get(MAM_temp_nc,varid="temp2")-273.15
 pp_data[[2]][[2]] = ncdf4::ncvar_get(MAM_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[2]][[3]] = ncdf4::ncvar_get(MAM_slp_nc,varid="slp")/100
 
 pp_data[[3]][[1]] = ncdf4::ncvar_get(JJA_temp_nc,varid="temp2")-273.15
 pp_data[[3]][[2]] = ncdf4::ncvar_get(JJA_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[3]][[3]] = ncdf4::ncvar_get(JJA_slp_nc,varid="slp")/100
 
 pp_data[[4]][[1]] = ncdf4::ncvar_get(SON_temp_nc,varid="temp2")-273.15
 pp_data[[4]][[2]] = ncdf4::ncvar_get(SON_prec_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month
-# pp_data[[4]][[3]] = ncdf4::ncvar_get(SON_slp_nc,varid="slp")/100
 
 # Extract list of longitudes/latitudes
 lon = annual_temp_nc$dim[[3]]$vals
@@ -209,12 +198,6 @@ ncdf4::nc_close(DJF_prec_nc)
 ncdf4::nc_close(MAM_prec_nc)
 ncdf4::nc_close(JJA_prec_nc)
 ncdf4::nc_close(SON_prec_nc)
-
-# ncdf4::nc_close(annual_slp_nc)
-# ncdf4::nc_close(DJF_slp_nc)
-# ncdf4::nc_close(MAM_slp_nc)
-# ncdf4::nc_close(JJA_slp_nc)
-# ncdf4::nc_close(SON_slp_nc)
 
 ## Create dataframe of continent lon/lats and Set initial latlon values
 Europe = c(-30,40,30,75) 
@@ -250,12 +233,6 @@ initial_year_values = century_years[,random_century]
 
 ## Load grid square weights for calculating means
 latlon_weights = as.matrix(read.csv("data/latlon_weights.csv"))
-
-# Load shapefiles for maps (rnaturalearth)
-# coast <- sf::st_read("data/geodata_maps/coast.shp")
-# countries <- sf::st_read("data/geodata_maps/countries.shp")
-# oceans <- sf::st_read("data/geodata_maps/oceans.shp")
-# land <- sf::st_read("data/geodata_maps/land.shp")
 
 coast <- readRDS("data/geodata_maps/coast.rds")
 countries <- readRDS("data/geodata_maps/countries.rds")
