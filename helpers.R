@@ -419,6 +419,94 @@ generate_map_dimensions = function(subset_lon_IDs,
 #'
 #' @return Numeric vector of length 4: c(pre-processing flag, dataset ID, variable ID, season ID).
 
+# generate_data_ID = function(dataset,
+#                             variable,
+#                             month_range){
+#   
+#   # Generate dataset reference
+#   if (dataset == "ModE-RA"){
+#     dataset_ref = 1
+#   } else if (dataset == "ModE-Sim"){
+#     dataset_ref = 2
+#   } else if (dataset == "ModE-RAclim"){
+#     dataset_ref = 3
+#   } else { # dataset == "SD ratio"
+#     dataset_ref = 4   
+#   }
+#   
+#   # Generate variable reference
+#   if (variable == "Temperature"){
+#     variable_ref = 1      
+#   } else if (variable == "Precipitation"){
+#     variable_ref = 2
+#   } else if (variable == "SLP"){
+#     variable_ref = 3
+#   } else { # (variable == "Z500")
+#     variable_ref = 4
+#   }
+#   
+#   # Helper: map month_range to (season_ref, pp_available) for a given pp flag
+#   set_season_and_pp <- function(month_range, pp_flag_if_match) {
+#     if (identical(month_range, c(1,12))) {
+#       season_ref <- 5
+#       pp_available <- pp_flag_if_match
+#     } else if (identical(month_range, c(0,2))) {
+#       season_ref <- 1
+#       pp_available <- pp_flag_if_match
+#     } else if (identical(month_range, c(3,5))) {
+#       season_ref <- 2
+#       pp_available <- pp_flag_if_match
+#     } else if (identical(month_range, c(6,8))) {
+#       season_ref <- 3
+#       pp_available <- pp_flag_if_match
+#     } else if (identical(month_range, c(9,11))) {
+#       season_ref <- 4
+#       pp_available <- pp_flag_if_match
+#     } else {
+#       season_ref <- NA
+#       pp_available <- 0
+#     }
+#     list(season_ref = season_ref, pp_available = pp_available)
+#   }
+#   
+#   # Check for preprocessed data and add season reference
+#   if (dataset == "ModE-RA" && variable %in% c("Temperature", "Precipitation")) {
+#     
+#     # ModE-RA Temperature & Precipitation:
+#     # preprocessed AND preloaded in pp_data -> pp_available = 1
+#     res <- set_season_and_pp(month_range, pp_flag_if_match = 1)
+#     season_ref   <- res$season_ref
+#     pp_available <- res$pp_available
+#     
+#   } else if (dataset == "ModE-RA" && variable == "SLP") {
+#     
+#     # ModE-RA SLP:
+#     # preprocessed exists (seasonal/year files) BUT not preloaded in pp_data
+#     # -> pp_available = 2
+#     res <- set_season_and_pp(month_range, pp_flag_if_match = 2)
+#     season_ref   <- res$season_ref
+#     pp_available <- res$pp_available
+#     
+#   } else {
+#     
+#     # Other data (ModE-Sim, ModE-RAclim, SD ratio, or Z500 for any dataset):
+#     # may be preprocessed, but is never preloaded in pp_data
+#     # -> pp_available = 2 for standard seasons/year
+#     res <- set_season_and_pp(month_range, pp_flag_if_match = 2)
+#     season_ref   <- res$season_ref
+#     pp_available <- res$pp_available
+#   }
+#   
+#   # Create data reference:
+#   #  pp_available:
+#   #    0 = no preprocessed data
+#   #    1 = preprocessed & preloaded (pp_data)
+#   #    2 = preprocessed exists but must be loaded
+#   data_ref = c(pp_available, dataset_ref, variable_ref, season_ref)
+#   
+#   return(data_ref)
+# }
+
 generate_data_ID = function(dataset,
                             variable,
                             month_range){
@@ -445,23 +533,23 @@ generate_data_ID = function(dataset,
     variable_ref = 4
   }
   
-  # Helper: map month_range to (season_ref, pp_available) for a given pp flag
-  set_season_and_pp <- function(month_range, pp_flag_if_match) {
+  # Helper: map month_range to (season_ref, pp_available = 2 if standard season, else 0)
+  map_season <- function(month_range) {
     if (identical(month_range, c(1,12))) {
       season_ref <- 5
-      pp_available <- pp_flag_if_match
+      pp_available <- 2
     } else if (identical(month_range, c(0,2))) {
       season_ref <- 1
-      pp_available <- pp_flag_if_match
+      pp_available <- 2
     } else if (identical(month_range, c(3,5))) {
       season_ref <- 2
-      pp_available <- pp_flag_if_match
+      pp_available <- 2
     } else if (identical(month_range, c(6,8))) {
       season_ref <- 3
-      pp_available <- pp_flag_if_match
+      pp_available <- 2
     } else if (identical(month_range, c(9,11))) {
       season_ref <- 4
-      pp_available <- pp_flag_if_match
+      pp_available <- 2
     } else {
       season_ref <- NA
       pp_available <- 0
@@ -469,39 +557,14 @@ generate_data_ID = function(dataset,
     list(season_ref = season_ref, pp_available = pp_available)
   }
   
-  # Check for preprocessed data and add season reference
-  if (dataset == "ModE-RA" && variable %in% c("Temperature", "Precipitation")) {
-    
-    # ModE-RA Temperature & Precipitation:
-    # preprocessed AND preloaded in pp_data -> pp_available = 1
-    res <- set_season_and_pp(month_range, pp_flag_if_match = 1)
-    season_ref   <- res$season_ref
-    pp_available <- res$pp_available
-    
-  } else if (dataset == "ModE-RA" && variable == "SLP") {
-    
-    # ModE-RA SLP:
-    # preprocessed exists (seasonal/year files) BUT not preloaded in pp_data
-    # -> pp_available = 2
-    res <- set_season_and_pp(month_range, pp_flag_if_match = 2)
-    season_ref   <- res$season_ref
-    pp_available <- res$pp_available
-    
-  } else {
-    
-    # Other data (ModE-Sim, ModE-RAclim, SD ratio, or Z500 for any dataset):
-    # may be preprocessed, but is never preloaded in pp_data
-    # -> pp_available = 2 for standard seasons/year
-    res <- set_season_and_pp(month_range, pp_flag_if_match = 2)
-    season_ref   <- res$season_ref
-    pp_available <- res$pp_available
-  }
+  res <- map_season(month_range)
+  season_ref   <- res$season_ref
+  pp_available <- res$pp_available
   
-  # Create data reference:
-  #  pp_available:
-  #    0 = no preprocessed data
-  #    1 = preprocessed & preloaded (pp_data)
-  #    2 = preprocessed exists but must be loaded
+  # Create data reference
+  # pp_available:
+  #   0 = no preprocessed data (use monthly via load_ModE_data)
+  #   2 = preprocessed exists on disk (use load_preprocessed_data)
   data_ref = c(pp_available, dataset_ref, variable_ref, season_ref)
   
   return(data_ref)
@@ -644,13 +707,149 @@ load_ModE_data = function(dataset,
 #' 
 #' @return A 3D numeric array (longitude x latitude x time) of the requested climate data.
 
+# load_preprocessed_data = function(data_ID){
+#   
+#   # Mod E-RA
+#   if (data_ID[2] == 1){ # ModE-RA
+#     # get variable and month names
+#     vname = "geopoth_50000"
+#     mname = switch(data_ID[4],
+#                    "1" = "djf",
+#                    "2" = "mam",
+#                    "3" = "jja",
+#                    "4" = "son",
+#                    "5" = "year")
+#     
+#     # Open file
+#     data_nc = ncdf4::nc_open(paste0("data/ModE-RA/",mname,"/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_",vname,"_abs_1421-2008_",mname,".nc"))
+#     
+#     # extract data and convert units if necessary                  
+#     data_output = ncdf4::ncvar_get(data_nc,varid="geopoth")
+#     
+#     ncdf4::nc_close(data_nc)
+#   } 
+#   
+#   # ModE-SIM
+#   else if (data_ID[2] == 2){ # ModE-Sim
+#     # get variable name and month names
+#     vname =  switch(data_ID[3],
+#                     "1" = "temp2",
+#                     "2" = "totprec",
+#                     "3" = "slp",
+#                     "4" = "geopoth_50000")
+#     mname = switch(data_ID[4],
+#                    "1" = "djf",
+#                    "2" = "mam",
+#                    "3" = "jja",
+#                    "4" = "son",
+#                    "5" = "year")
+#     
+#     # open file
+#     data_nc = ncdf4::nc_open(paste0("data/ModE-SIM/",mname,"/ModE-Sim_lowres_20mem_Set_1420-3_1850-1_ensmean_",vname,"_abs_1420-2009_",mname,".nc"))
+#     
+#     # extract data and convert units if necessary                  
+#     if (data_ID[3] == 1){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="temp2")-273.15 
+#     } else if (data_ID[3] == 2){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month 
+#     } else if (data_ID[3] == 3){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="slp")/100 
+#     } else {
+#       data_output = ncdf4::ncvar_get(data_nc,varid="geopoth")
+#     }
+#     
+#     # remove the first year (1421)
+#     data_output = data_output[,,2:589]
+#     
+#     ncdf4::nc_close(data_nc)
+#   }
+#   
+#   # ModE-RAclim
+#   else if (data_ID[2] == 3) { # ModE-RAclim
+#     # get variable name and month names
+#     vname =  switch(data_ID[3],
+#                     "1" = "temp2",
+#                     "2" = "totprec",
+#                     "3" = "slp",
+#                     "4" = "geopoth_50000")
+#     mname = switch(data_ID[4],
+#                    "1" = "djf",
+#                    "2" = "mam",
+#                    "3" = "jja",
+#                    "4" = "son",
+#                    "5" = "year")
+#     
+#     # Open file
+#     data_nc = ncdf4::nc_open(paste0("data/ModE-RAclim/",mname,"/ModE-RAclim_ensmean_",vname,"_anom_1421-2008_",mname,".nc"))
+#     
+#     # extract data and convert units if necessary                  
+#     if (data_ID[3] == 1){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="temp2") 
+#     } else if (data_ID[3] == 2){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month 
+#     } else if (data_ID[3] == 3){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="slp")/100 
+#     } else {
+#       data_output = ncdf4::ncvar_get(data_nc,varid="geopoth")
+#     }
+#     
+#     ncdf4::nc_close(data_nc)
+#   }
+#   
+#   # SDratio
+#   else if (data_ID[2] == 4){
+#     # get variable name and month names
+#     vname =  switch(data_ID[3],
+#                     "1" = "temp2",
+#                     "2" = "totprec",
+#                     "3" = "slp",
+#                     "4" = "geopoth_50000")
+#     mname = switch(data_ID[4],
+#                    "1" = "djf",
+#                    "2" = "mam",
+#                    "3" = "jja",
+#                    "4" = "son",
+#                    "5" = "year")
+#     
+#     # Open file
+#     data_nc = ncdf4::nc_open(paste0("data/SD_ratio/",mname,"/ModE-RA_lowres_20mem_Set_1420-3_1850-1_sd_ratio_",vname,"_abs_1421-2008_",mname,".nc"))
+#     
+#     # extract data and convert units if necessary                  
+#     if (data_ID[3] == 1){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="temp2") 
+#     } else if (data_ID[3] == 2){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="totprec")
+#     } else if (data_ID[3] == 3){
+#       data_output = ncdf4::ncvar_get(data_nc,varid="slp")
+#     } else {
+#       data_output = ncdf4::ncvar_get(data_nc,varid="geopoth")
+#     }
+#     
+#     ncdf4::nc_close(data_nc)
+#     
+#     # Add an extra year at the start for djf
+#     if(mname == "djf"){
+#       empty_year = array(NA, dim = c(192,96,588))
+#       empty_year[,,c(2:588)] = data_output
+#       data_output = empty_year
+#     }
+#   }
+#   
+#   return(data_output)
+#   
+# }
+
 load_preprocessed_data = function(data_ID){
   
-  # Mod E-RA
+  # ModE-RA
   if (data_ID[2] == 1){ # ModE-RA
     # get variable and month names
-    vname = "geopoth_50000"
-    mname = switch(data_ID[4],
+    vname = switch(as.character(data_ID[3]),
+                   "1" = "temp2",
+                   "2" = "totprec",
+                   "3" = "slp",
+                   "4" = "geopoth_50000")
+    mname = switch(as.character(data_ID[4]),
                    "1" = "djf",
                    "2" = "mam",
                    "3" = "jja",
@@ -658,41 +857,52 @@ load_preprocessed_data = function(data_ID){
                    "5" = "year")
     
     # Open file
-    data_nc = ncdf4::nc_open(paste0("data/ModE-RA/",mname,"/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_",vname,"_abs_1421-2008_",mname,".nc"))
+    data_nc = ncdf4::nc_open(paste0(
+      "data/ModE-RA/", mname, "/ModE-RA_lowres_20mem_Set_1420-3_1850-1_ensmean_",
+      vname, "_abs_1421-2008_", mname, ".nc"
+    ))
     
     # extract data and convert units if necessary                  
-    data_output = ncdf4::ncvar_get(data_nc,varid="geopoth")
+    if (data_ID[3] == 1){
+      data_output = ncdf4::ncvar_get(data_nc, varid = "temp2") - 273.15 
+    } else if (data_ID[3] == 2){
+      data_output = ncdf4::ncvar_get(data_nc, varid = "totprec") * 2629756.8
+    } else if (data_ID[3] == 3){
+      data_output = ncdf4::ncvar_get(data_nc, varid = "slp") / 100 
+    } else {
+      data_output = ncdf4::ncvar_get(data_nc, varid = "geopoth")
+    }
     
     ncdf4::nc_close(data_nc)
   } 
   
   # ModE-SIM
   else if (data_ID[2] == 2){ # ModE-Sim
-    # get variable name and month names
-    vname =  switch(data_ID[3],
-                    "1" = "temp2",
-                    "2" = "totprec",
-                    "3" = "slp",
-                    "4" = "geopoth_50000")
-    mname = switch(data_ID[4],
+    vname = switch(as.character(data_ID[3]),
+                   "1" = "temp2",
+                   "2" = "totprec",
+                   "3" = "slp",
+                   "4" = "geopoth_50000")
+    mname = switch(as.character(data_ID[4]),
                    "1" = "djf",
                    "2" = "mam",
                    "3" = "jja",
                    "4" = "son",
                    "5" = "year")
     
-    # open file
-    data_nc = ncdf4::nc_open(paste0("data/ModE-SIM/",mname,"/ModE-Sim_lowres_20mem_Set_1420-3_1850-1_ensmean_",vname,"_abs_1420-2009_",mname,".nc"))
+    data_nc = ncdf4::nc_open(paste0(
+      "data/ModE-SIM/", mname, "/ModE-Sim_lowres_20mem_Set_1420-3_1850-1_ensmean_",
+      vname, "_abs_1420-2009_", mname, ".nc"
+    ))
     
-    # extract data and convert units if necessary                  
     if (data_ID[3] == 1){
-      data_output = ncdf4::ncvar_get(data_nc,varid="temp2")-273.15 
+      data_output = ncdf4::ncvar_get(data_nc, varid = "temp2") - 273.15 
     } else if (data_ID[3] == 2){
-      data_output = ncdf4::ncvar_get(data_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month 
+      data_output = ncdf4::ncvar_get(data_nc, varid = "totprec") * 2629756.8
     } else if (data_ID[3] == 3){
-      data_output = ncdf4::ncvar_get(data_nc,varid="slp")/100 
+      data_output = ncdf4::ncvar_get(data_nc, varid = "slp") / 100 
     } else {
-      data_output = ncdf4::ncvar_get(data_nc,varid="geopoth")
+      data_output = ncdf4::ncvar_get(data_nc, varid = "geopoth")
     }
     
     # remove the first year (1421)
@@ -703,77 +913,76 @@ load_preprocessed_data = function(data_ID){
   
   # ModE-RAclim
   else if (data_ID[2] == 3) { # ModE-RAclim
-    # get variable name and month names
-    vname =  switch(data_ID[3],
-                    "1" = "temp2",
-                    "2" = "totprec",
-                    "3" = "slp",
-                    "4" = "geopoth_50000")
-    mname = switch(data_ID[4],
+    vname = switch(as.character(data_ID[3]),
+                   "1" = "temp2",
+                   "2" = "totprec",
+                   "3" = "slp",
+                   "4" = "geopoth_50000")
+    mname = switch(as.character(data_ID[4]),
                    "1" = "djf",
                    "2" = "mam",
                    "3" = "jja",
                    "4" = "son",
                    "5" = "year")
     
-    # Open file
-    data_nc = ncdf4::nc_open(paste0("data/ModE-RAclim/",mname,"/ModE-RAclim_ensmean_",vname,"_anom_1421-2008_",mname,".nc"))
+    data_nc = ncdf4::nc_open(paste0(
+      "data/ModE-RAclim/", mname, "/ModE-RAclim_ensmean_",
+      vname, "_anom_1421-2008_", mname, ".nc"
+    ))
     
-    # extract data and convert units if necessary                  
     if (data_ID[3] == 1){
-      data_output = ncdf4::ncvar_get(data_nc,varid="temp2") 
+      data_output = ncdf4::ncvar_get(data_nc, varid = "temp2") 
     } else if (data_ID[3] == 2){
-      data_output = ncdf4::ncvar_get(data_nc,varid="totprec")*2629756.8 # Multiply by 30.437*24*60*60 to convert Kg m-2 s-2 to get mm/month 
+      data_output = ncdf4::ncvar_get(data_nc, varid = "totprec") * 2629756.8
     } else if (data_ID[3] == 3){
-      data_output = ncdf4::ncvar_get(data_nc,varid="slp")/100 
+      data_output = ncdf4::ncvar_get(data_nc, varid = "slp") / 100 
     } else {
-      data_output = ncdf4::ncvar_get(data_nc,varid="geopoth")
+      data_output = ncdf4::ncvar_get(data_nc, varid = "geopoth")
     }
     
     ncdf4::nc_close(data_nc)
   }
   
-  # SDratio
+  # SD ratio
   else if (data_ID[2] == 4){
-    # get variable name and month names
-    vname =  switch(data_ID[3],
-                    "1" = "temp2",
-                    "2" = "totprec",
-                    "3" = "slp",
-                    "4" = "geopoth_50000")
-    mname = switch(data_ID[4],
+    vname = switch(as.character(data_ID[3]),
+                   "1" = "temp2",
+                   "2" = "totprec",
+                   "3" = "slp",
+                   "4" = "geopoth_50000")
+    mname = switch(as.character(data_ID[4]),
                    "1" = "djf",
                    "2" = "mam",
                    "3" = "jja",
                    "4" = "son",
                    "5" = "year")
     
-    # Open file
-    data_nc = ncdf4::nc_open(paste0("data/SD_ratio/",mname,"/ModE-RA_lowres_20mem_Set_1420-3_1850-1_sd_ratio_",vname,"_abs_1421-2008_",mname,".nc"))
+    data_nc = ncdf4::nc_open(paste0(
+      "data/SD_ratio/", mname, "/ModE-RA_lowres_20mem_Set_1420-3_1850-1_sd_ratio_",
+      vname, "_abs_1421-2008_", mname, ".nc"
+    ))
     
-    # extract data and convert units if necessary                  
     if (data_ID[3] == 1){
-      data_output = ncdf4::ncvar_get(data_nc,varid="temp2") 
+      data_output = ncdf4::ncvar_get(data_nc, varid = "temp2") 
     } else if (data_ID[3] == 2){
-      data_output = ncdf4::ncvar_get(data_nc,varid="totprec")
+      data_output = ncdf4::ncvar_get(data_nc, varid = "totprec")
     } else if (data_ID[3] == 3){
-      data_output = ncdf4::ncvar_get(data_nc,varid="slp")
+      data_output = ncdf4::ncvar_get(data_nc, varid = "slp")
     } else {
-      data_output = ncdf4::ncvar_get(data_nc,varid="geopoth")
+      data_output = ncdf4::ncvar_get(data_nc, varid = "geopoth")
     }
     
     ncdf4::nc_close(data_nc)
     
     # Add an extra year at the start for djf
-    if(mname == "djf"){
-      empty_year = array(NA, dim = c(192,96,588))
-      empty_year[,,c(2:588)] = data_output
+    if (mname == "djf"){
+      empty_year = array(NA, dim = c(192, 96, 588))
+      empty_year[,,2:588] = data_output
       data_output = empty_year
     }
   }
   
   return(data_output)
-  
 }
 
 
@@ -788,18 +997,27 @@ load_preprocessed_data = function(data_ID){
 #' 
 #' @return A numeric array subsetted by the specified longitude and latitude indices.
 
+# create_latlon_subset = function(data_input,
+#                                 data_ID,
+#                                 subset_lon_IDs,
+#                                 subset_lat_IDs){
+#   if (data_ID[1] == 1){
+#     # subset preprocessed data
+#     data_subset = pp_data[[data_ID[4]]][[data_ID[3]]][subset_lon_IDs,subset_lat_IDs,]
+#   } 
+#   else {
+#     # subset base/loaded preprocessed data
+#     data_subset = data_input[subset_lon_IDs,subset_lat_IDs,]
+#   }
+#   return(data_subset)
+# }
+
 create_latlon_subset = function(data_input,
                                 data_ID,
                                 subset_lon_IDs,
                                 subset_lat_IDs){
-  if (data_ID[1] == 1){
-    # subset preprocessed data
-    data_subset = pp_data[[data_ID[4]]][[data_ID[3]]][subset_lon_IDs,subset_lat_IDs,]
-  } 
-  else {
-    # subset base/loaded preprocessed data
-    data_subset = data_input[subset_lon_IDs,subset_lat_IDs,]
-  }
+  # Always subset the provided data_input
+  data_subset = data_input[subset_lon_IDs, subset_lat_IDs, ]
   return(data_subset)
 }
 

@@ -202,7 +202,7 @@ ui <- navbarPage(
                    h5(strong("Notice", style = "color: #094030;")),
                    h5(
                      "This is ", strong("ClimeApp Light."), "Download the full desktop version ",
-                     actionLink("go_desktop", tags$strong("here."))
+                     actionLink("go_desktop2", tags$strong("here."))
                    )
                  ), 
                  
@@ -2462,7 +2462,7 @@ ui <- navbarPage(
                                    tabPanel("ModE-RA sources", br(),
                                             
                                             # Title & help pop up
-                                            MEsource_popover("pop_anomalies_mesource"),
+                                            MEsource_popover("pop_composites_mesource"),
                                             
                                             fluidRow(
                                               
@@ -4268,7 +4268,7 @@ ui <- navbarPage(
                                    tabPanel("ModE-RA sources", value = "corr_fad_tab", br(),
                                             
                                             # Title & help pop up
-                                            MEsource_popover("pop_anomalies_mesource"),
+                                            MEsource_popover("pop_correlation_mesource"),
                                             
                                             fluidRow(
                                               

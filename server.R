@@ -9277,6 +9277,10 @@ server <- function(input, output, session) {
     updateTabsetPanel(session, "tabset0", selected = "desktop_tab")
   })
   
+  observeEvent(input$go_desktop2, {
+    updateTabsetPanel(session, "tabset0", selected = "desktop_tab")
+  })
+  
   #Updates Values outside of min / max (numericInput)
   
   updateNumericInputRange1 <- function(inputId, minValue, maxValue) {
