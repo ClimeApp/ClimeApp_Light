@@ -431,7 +431,7 @@ ui <- navbarPage(
                                     tags$ul(
                                       tags$li("Regression analysis"),
                                       tags$li("Annual cycle analysis"),
-                                      tags$li("Custom statistics (SD ratio, % sign match")
+                                      tags$li("Custom statistics (SD ratio, % sign match)")
                                     ),
                                     br(),
                                     downloadButton("climeapp_desktop_download",
