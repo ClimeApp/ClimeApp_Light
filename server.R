@@ -2592,7 +2592,7 @@ server <- function(input, output, session) {
   })
   
   observe({
-    if(input$mode_selected2 == "X years prior"){
+    if(input$mode_selected2 == "X years prior" | input$mode_selected2 == "Custom reference"){
       updateRadioButtons(
         inputId = "ref_map_mode2",
         label    = NULL,
@@ -6825,7 +6825,8 @@ server <- function(input, output, session) {
       create_map_datatable(data_input = data_output2_primary(),
                            subset_lon_IDs = subset_lons_primary(),
                            subset_lat_IDs = subset_lats_primary())
-    } else if (input$ref_map_mode2 == "Reference Values") {
+    } else if (input$ref_map_mode2 == "Reference Values" &&
+               input$mode_selected2 == "Fixed reference") {
       create_map_datatable(data_input = data_output3_primary(),
                            subset_lon_IDs = subset_lons_primary(),
                            subset_lat_IDs = subset_lats_primary())
@@ -6843,7 +6844,7 @@ server <- function(input, output, session) {
     # Define mode-specific parameters
     mode_params <- list(
       "Absolute Values" = list(type = "composites", years = year_set_comp()),
-      "Reference Values" = list(type = "reference", years = year_set_comp_ref()),
+      "Reference Values" = list(type = "reference", years = input$ref_period2),
       "SD ratio" = list(type = "sdratio", years = c(NA, NA))
     )
     params <- mode_params[[input$ref_map_mode2]]
