@@ -86,8 +86,8 @@ setup_user_environment()
   library(shiny, lib.loc = lib_path)
   library(ggplot2, lib.loc = lib_path)
   library(htmltools, lib.loc = lib_path)
-  #library(terra, lib.loc = lib_path)
-  
+
+  # library(terra, lib.loc = lib_path)
   # library(shinyWidgets, lib.loc = lib_path)
   # library(RColorBrewer, lib.loc = lib_path)
   # library(shinyjs, lib.loc = lib_path)
@@ -105,7 +105,6 @@ setup_user_environment()
   # library(burnr, lib.loc = lib_path)
   # library(shinyjqui, lib.loc = lib_path)
   # library(ncdf4, lib.loc = lib_path)
-  
   # library(maps, lib.loc = lib_path)
   # library(mapdata, lib.loc = lib_path)
   # library(xlsx, lib.loc = lib_path)
