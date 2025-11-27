@@ -1101,7 +1101,7 @@ ui <- navbarPage(
                                             conditionalPanel(
                                               condition = "input.ref_map_mode && input.ref_map_mode !== 'None'",
                                               shinycssloaders::withSpinner(
-                                                ui_element = plotOutput("ref_map", height = "750px"),
+                                                ui_element = plotOutput("ref_map", height = "auto"),
                                                 image = spinner_image,
                                                 image.width = spinner_width,
                                                 image.height = spinner_height
@@ -2106,7 +2106,7 @@ ui <- navbarPage(
                                             conditionalPanel(
                                               condition = "input.ref_map_mode2 && input.ref_map_mode2 !== 'None'",
                                               shinycssloaders::withSpinner(
-                                                ui_element = plotOutput("ref_map2", height = "750px"),
+                                                ui_element = plotOutput("ref_map2", height = "auto"),
                                                 image = spinner_image,
                                                 image.width = spinner_width,
                                                 image.height = spinner_height
