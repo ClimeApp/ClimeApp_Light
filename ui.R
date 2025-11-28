@@ -464,6 +464,7 @@ ui <- navbarPage(
                                       tags$li("Balanced library loading"),
                                       tags$li("Plot caching"),
                                       tags$li("Improved map plotting function"),
+                                      tags$li("Small bug fixing"),
                                       tags$li(a("View code on GitHub", 
                                                 href = "https://github.com/ClimeApp/ClimeApp_development/tree/ClimeApp_v1.5", 
                                                 target = "_blank")),
