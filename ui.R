@@ -201,7 +201,7 @@ ui <- navbarPage(
                    style = "border: 5px solid #094030; padding: 10px; border-radius: 5px; color: #094030; background-color: white;",
                    h5(strong("Notice", style = "color: #094030;")),
                    h5(
-                     "This is ", strong("ClimeApp Light."), "Initial plots might take longer to load. Download the full desktop version ",
+                     "This is ", strong("ClimeApp Light."), "Download the full desktop version ",
                      actionLink("go_desktop2", tags$strong("here."))
                    )
                  ), 

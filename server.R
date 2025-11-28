@@ -2592,7 +2592,7 @@ server <- function(input, output, session) {
   })
   
   observe({
-    if(input$mode_selected2 == "X years prior" | input$mode_selected2 == "Custom reference"){
+    if(input$mode_selected2 == "X years prior"){
       updateRadioButtons(
         inputId = "ref_map_mode2",
         label    = NULL,
@@ -5856,21 +5856,17 @@ server <- function(input, output, session) {
   }
  
   
-  ###### Cached Plot
+   ###### Cached Plot 
   output$map <- renderCachedPlot({
     start_time <- Sys.time()
-    
     req(map_dimensions()[1], map_dimensions()[2])
     
     p <- map_plot()
     
     end_time <- Sys.time()
-    
     message("Map generated in ", round(end_time - start_time, 3), " seconds")
-    
     p
-    
-  }, 
+  },
   
   # Cache key expression
   cacheKeyExpr = {
@@ -6835,8 +6831,7 @@ server <- function(input, output, session) {
       create_map_datatable(data_input = data_output2_primary(),
                            subset_lon_IDs = subset_lons_primary(),
                            subset_lat_IDs = subset_lats_primary())
-    } else if (input$ref_map_mode2 == "Reference Values" &&
-               input$mode_selected2 == "Fixed reference") {
+    } else if (input$ref_map_mode2 == "Reference Values") {
       create_map_datatable(data_input = data_output3_primary(),
                            subset_lon_IDs = subset_lons_primary(),
                            subset_lat_IDs = subset_lats_primary())
@@ -6854,7 +6849,7 @@ server <- function(input, output, session) {
     # Define mode-specific parameters
     mode_params <- list(
       "Absolute Values" = list(type = "composites", years = year_set_comp()),
-      "Reference Values" = list(type = "reference", years = input$ref_period2),
+      "Reference Values" = list(type = "reference", years = year_set_comp_ref()),
       "SD ratio" = list(type = "sdratio", years = c(NA, NA))
     )
     params <- mode_params[[input$ref_map_mode2]]

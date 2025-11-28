@@ -1400,383 +1400,40 @@ set_ts_axis_values = function(data_input) {
 #' @param label_mountains Logical, whether to label mountains.
 #'
 #' @return A ggplot object representing the map.
+# Plot map with ggplot2 ----------------------------------------------------
 
-# Plot map with ggplot2
-# plot_map <- function(data_input,
-#                      lon_lat_range,
-#                      variable = NULL,
-#                      mode = NULL,
-#                      titles = NULL,
-#                      axis_range = NULL,
-#                      hide_axis = FALSE,
-#                      points_data = data.frame(),
-#                      highlights_data = data.frame(),
-#                      stat_highlights_data = data.frame(),
-#                      c_borders = TRUE,
-#                      white_ocean = FALSE,
-#                      white_land = FALSE,
-#                      shpOrder = NULL,
-#                      plotOrder = NULL,
-#                      input = NULL,
-#                      plotType = "default",
-#                      projection = "UTM (default)",
-#                      center_lat = 0,
-#                      center_lon = 0,
-#                      show_rivers = FALSE,
-#                      label_rivers = FALSE,
-#                      show_lakes = FALSE,
-#                      label_lakes = FALSE,
-#                      show_mountains = FALSE,
-#                      label_mountains = FALSE) {
-#   
-#   # Define the color palette and unit based on the variable and mode
-#   if (!is.null(variable)) {
-#     if (variable == "Temperature") {
-#       v_col <- rev(RColorBrewer::brewer.pal(11, "RdBu"))
-#       v_unit <- "\u00B0C"
-#     } else if (variable == "Precipitation") {
-#       v_col <- RColorBrewer::brewer.pal(11, "BrBG")
-#       v_unit <- "mm/mon."
-#     } else if (variable == "SLP") {
-#       v_col <- rev(RColorBrewer::brewer.pal(11, "PRGn"))
-#       v_unit <- "hPa"
-#     } else if (variable == "Z500") {
-#       v_col <- rev(RColorBrewer::brewer.pal(11, "PRGn"))
-#       v_unit <- "m"
-#     }
-#   }
-#   
-#   # Handle the 'mode' condition as well
-#   if (!is.null(mode)) {
-#     if (mode == "Correlation") {
-#       v_col <- rev(RColorBrewer::brewer.pal(11, "PuOr"))
-#       v_unit <- "r"
-#       
-#     } else if (mode == "Regression_coefficients") {
-#       v_col <- viridis::viridis(11, option = "turbo")
-#       v_unit <- "Coefficient"
-#       titles$map_title <- titles$map_title_coeff
-#       titles$map_subtitle <- titles$map_subtitle_coeff
-#       titles$map_title_size <- titles$map_title_size_coeff
-#       
-#     } else if (mode == "Regression_p_values") {
-#       v_col <- rev(RColorBrewer::brewer.pal(5, "Greens"))
-#       v_unit <- "p\nValues"
-#       v_lev <- c(0, 0.01, 0.05, 0.1, 0.2, 1)
-#       titles$map_title <- titles$map_title_pvals
-#       titles$map_subtitle <- titles$map_subtitle_pvals
-#       titles$map_title_size <- titles$map_title_size_pvals
-#       
-#     } else if (mode == "Regression_residuals") {
-#       v_unit <- paste("Residuals\n", v_unit)
-#       titles$map_title <- titles$map_title_res
-#       titles$map_subtitle <- titles$map_subtitle_res
-#       titles$map_title_size <- titles$map_title_size_res
-#       
-#     } else if (mode == "SD ratio") {
-#       v_col <- rev(RColorBrewer::brewer.pal(9, "Greens"))
-#       v_unit <- ""
-#     }
-#   }
-#   if (is.null(axis_range)) {
-#     if (!is.null(mode) && mode == "Regression_p_values") {
-#       axis_range <- c(1e-3, 1)
-#     } else if (!is.null(mode) && mode == "SD ratio") {
-#       axis_range <- c(0, 1)
-#     } else {
-#       max_abs_z <- max(abs(terra::values(data_input)), na.rm = TRUE)
-#       axis_range <- c(-max_abs_z, max_abs_z)
-#     }
-#   }
-#   
-#   p <- ggplot() +
-#     tidyterra::geom_spatraster_contour_filled(data = data_input, aes(fill = after_stat(level_mid)), bins = 20) +
-#     labs(fill = v_unit) +
-#     guides(
-#       fill = if (hide_axis)
-#         "none"
-#       else
-#         guide_colorbar(
-#           barwidth = 2,
-#           barheight = unit(0.75, "npc"),
-#           title = v_unit,
-#           title.position = "top",
-#           title.hjust = 0.25,
-#           display = "rectangles",
-#           draw.ulim = FALSE,
-#           draw.llim = FALSE,
-#           label.theme = element_text(size = titles$map_title_size / 1.6),
-#           title.theme = element_text(size = titles$map_title_size / 1.6),
-#           frame.colour = "black",
-#           frame.linewidth = 0.5,
-#           ticks.colour = "black",
-#           ticks.linewidth = 0.5
-#         )
-#     )
-#   
-#   if (!is.null(mode) && mode == "Regression_p_values") {
-#     p <- p + scale_fill_gradientn(
-#       colors = v_col,
-#       trans = "log10",
-#       limits = axis_range,
-#       breaks = c(0.001, 0.01, 0.1, 1),
-#       labels = scales::label_comma(accuracy = 0.001)
-#     )
-#   } else {
-#     p <- p + scale_fill_stepsn(
-#       limits = axis_range,
-#       colors = v_col,
-#       n.breaks = 20,
-#       nice.breaks = TRUE,
-#       labels = function(breaks) {
-#         labels <- as.character(round(breaks, 2))
-#         labels[1] <- paste0("< ", labels[1])
-#         labels[length(labels)] <- paste0("> ", labels[length(labels)])
-#         labels
-#       }
-#     )
-#   }
-#   
-#   # Theme
-#   p <- p + if (projection == "UTM (default)")
-#     theme_bw()
-#   else
-#     theme_minimal()
-#   
-#   # Add coastline and country borders without inheriting x and y aesthetics
-#   p <- p + geom_sf(data = coast, color = "#333333", size = 0.5, inherit.aes = FALSE)
-#   if (white_ocean) p <- p + geom_sf(data = oceans, fill = "#DDDDDD", size = 0.5, inherit.aes = FALSE)
-#   if (white_land)  p <- p + geom_sf(data = land,   fill = "#DDDDDD", size = 0.5, inherit.aes = FALSE)
-#   if (c_borders)   p <- p + geom_sf(data = countries, color = "#333333", fill = NA, size = 0.5, inherit.aes = FALSE)
-#   
-#   if (show_rivers) {
-#     p <- p + geom_sf(data = rivers, color = "#2A52BE", size = 0.2, inherit.aes = FALSE)
-#     if (label_rivers && "name" %in% names(rivers)) {
-#       p <- p + geom_text(
-#         data = sf::st_centroid(rivers),
-#         aes(label = name, geometry = geometry),
-#         stat = "sf_coordinates", size = 5, color = "black", inherit.aes = FALSE
-#       )
-#     }
-#   }
-#   if (show_lakes) {
-#     p <- p + geom_sf(data = lakes, fill = "#DDDDDD", color = NA, inherit.aes = FALSE)
-#     if (label_lakes && "name" %in% names(lakes)) {
-#       p <- p + geom_text(
-#         data = sf::st_point_on_surface(lakes),
-#         aes(label = name, geometry = geometry),
-#         stat = "sf_coordinates", size = 5, color = "black", nudge_x = -1,
-#         inherit.aes = FALSE
-#       )
-#     }
-#   }
-#   if (show_mountains) {
-#     p <- p + geom_sf(data = mountains, color = "#333333", size = 3, shape = 17, inherit.aes = FALSE)
-#     if (label_mountains && "name" %in% names(mountains)) {
-#       p <- p + geom_text(
-#         data = mountains,
-#         aes(label = name, geometry = geometry),
-#         stat = "sf_coordinates", size = 5, color = "black", nudge_y = 0.75,
-#         inherit.aes = FALSE
-#       )
-#     }
-#   }
-#   # Add shapefiles (if provided) based on plotOrder and shpPickers
-#   
-#   # Define color picker prefix for shapefiles
-#   color_picker_prefix <- plotType
-#   if (!is.null(shpOrder) && !is.null(plotOrder) && length(shpOrder) > 0 && length(plotOrder) > 0) {
-#     # keep once, preserve order-of-first-appearance
-#     shpOrder <- shpOrder[!duplicated(shpOrder)]
-#     selected_files <- plotOrder[match(shpOrder, tools::file_path_sans_ext(basename(plotOrder)))]
-#     
-#     for (file in selected_files) {
-#       file_name <- tools::file_path_sans_ext(basename(file))
-#       message(paste("Adding shapefile to plot:", file_name))
-#       shape <- sf::st_read(file, quiet = TRUE)
-#       if (is.na(sf::st_crs(shape))) shape <- sf::st_set_crs(shape, sf::st_crs(4326)) else shape <- sf::st_transform(shape, 4326)
-#       
-#       col_pick <- input[[paste0(color_picker_prefix, file_name)]]
-#       if (is.null(col_pick) || is.na(col_pick) || !nzchar(col_pick)) col_pick <- "black"
-#       
-#       geom_type <- as.character(sf::st_geometry_type(shape))
-#       if (any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
-#         p <- p + geom_sf(data = shape, fill = NA, colour = col_pick, linewidth = 0.5, inherit.aes = FALSE)
-#       } else if (any(geom_type %in% c("LINESTRING", "MULTILINESTRING"))) {
-#         p <- p + geom_sf(data = shape, colour = col_pick, linewidth = 0.5, inherit.aes = FALSE)
-#       } else if (any(geom_type %in% c("POINT", "MULTIPOINT"))) {
-#         p <- p + geom_sf(data = shape, colour = col_pick, size = 2, inherit.aes = FALSE)
-#       }
-#     }
-#   }
-#   
-#   
-#   # Set projection
-#   if (projection == "Robinson") {
-#     p <- p + coord_sf(crs = sf::st_crs("+proj=robin"), clip = "on")
-#   } else if (projection == "Orthographic") {
-#     formula <- paste0("+proj=ortho +lat_0=", center_lat, " +lon_0=", center_lon,
-#                       " +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs")
-#     p <- p + coord_sf(crs = sf::st_crs(formula), clip = "on")
-#   } else if (projection == "LAEA") {
-#     formula <- paste0("+proj=laea +lat_0=0 +lon_0=0 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs")
-#     p <- p + coord_sf(crs = sf::st_crs(formula), clip = "on")
-#   } else {
-#     if (lon_lat_range[1]==lon_lat_range[2]) { lon_lat_range[1] <- lon_lat_range[1]-0.5; lon_lat_range[2] <- lon_lat_range[2]+0.5 }
-#     if (lon_lat_range[3]==lon_lat_range[4]) { lon_lat_range[3] <- lon_lat_range[3]-0.5; lon_lat_range[4] <- lon_lat_range[4]+0.5 }
-#     lon_lat_range[1] <- max(lon_lat_range[1], -179.0625)
-#     lon_lat_range[2] <- min(lon_lat_range[2],  177.1875)
-#     lon_lat_range[3] <- max(lon_lat_range[3],  -87.64735)
-#     lon_lat_range[4] <- min(lon_lat_range[4],   87.64735)
-#     p <- p + coord_sf(xlim = lon_lat_range[1:2], ylim = lon_lat_range[3:4], expand = FALSE, clip = "on")
-#   }
-#   
-#   # Add title and subtitle if provided
-#   if (!is.null(titles)) {
-#     if (titles$map_title != " " || titles$map_subtitle != " ") {
-#       p <- p + labs(
-#         title = ifelse(titles$map_title != " ", titles$map_title, NULL),
-#         subtitle = ifelse(titles$map_subtitle != " ", titles$map_subtitle, NULL)
-#       )
-#     }
-#     
-#     p <- p + theme(
-#       plot.title = ggtext::element_textbox_simple(size = titles$map_title_size, face = "bold", margin = margin(5,0,5,0)),
-#       plot.subtitle = ggtext::element_textbox_simple(size = titles$map_title_size/1.3, face = "plain", margin = margin(9,0,12,0)),
-#       axis.text = element_text(size = titles$map_title_size / 1.6)
-#     )
-#   }
-#   
-#   if (projection != "UTM (default)" &&
-#       nrow(stat_highlights_data) > 0 &&
-#       all(c("x_vals","y_vals") %in% names(stat_highlights_data))) {
-#     stat_highlights_data <- transform_points_df(
-#       df = stat_highlights_data,
-#       xcol = "x_vals", ycol = "y_vals",
-#       projection = projection, center_lat = center_lat, center_lon = center_lon
-#     )
-#   }
-#   
-#   built <- ggplot_build(p)
-#   pp <- built$layout$panel_params[[1]]
-#   get_range <- function(pp, axis = c("x","y")) {
-#     axis <- match.arg(axis)
-#     if (!is.null(pp[[paste0(axis, ".range")]])) {
-#       pp[[paste0(axis, ".range")]]
-#     } else if (!is.null(pp[[axis]]$range$range)) {
-#       pp[[axis]]$range$range
-#     } else if (!is.null(pp[[axis]]$range)) {
-#       pp[[axis]]$range
-#     } else c(-Inf, Inf)
-#   }
-#   xlim_cur <- get_range(pp, "x")
-#   ylim_cur <- get_range(pp, "y")
-#   
-#   # Transform statistical highlight points if projection is active
-#   if (projection != "UTM (default)" &&
-#       nrow(points_data) > 0 &&
-#       all(c("x_value","y_value") %in% names(points_data))) {
-#     points_data <- transform_points_df(
-#       df = points_data,
-#       xcol = "x_value", ycol = "y_value",
-#       projection = projection, center_lat = center_lat, center_lon = center_lon
-#     )
-#   }
-#   
-#   # Hard-filter points to the panel bounding box
-#   if (nrow(points_data) > 0 && all(c("x_value","y_value","color","shape","size","label") %in% names(points_data))) {
-#     
-#     points_data$x_value <- as.numeric(points_data$x_value)
-#     points_data$y_value <- as.numeric(points_data$y_value)
-#     
-#     inside <- with(points_data,
-#                    !is.na(x_value) & !is.na(y_value) &
-#                      x_value >= xlim_cur[1] & x_value <= xlim_cur[2] &
-#                      y_value >= ylim_cur[1] & y_value <= ylim_cur[2])
-#     points_in <- points_data[inside, , drop = FALSE]
-#     
-#     if (nrow(points_in) > 0) {
-#       p <- p +
-#         geom_point(
-#           data = points_in,
-#           aes(x = x_value, y = y_value, colour = I(color), shape = I(shape), size = I(size)),
-#           show.legend = FALSE, inherit.aes = FALSE
-#         ) +
-#         ggrepel::geom_text_repel(
-#           data = points_in,
-#           aes(x = x_value, y = y_value, label = label),
-#           size = 5, fontface = "bold",
-#           bg.color = "white", bg.r = 0.2,
-#           point.padding = 10,
-#           xlim = xlim_cur, ylim = ylim_cur,
-#           na.rm = TRUE, max.overlaps = Inf,
-#           show.legend = FALSE, inherit.aes = FALSE
-#         )
-#     }
-#     
-#   }
-#   
-#   # Transform highlight box coordinates if necessary
-#   if (nrow(stat_highlights_data) > 0) {
-#     filtered_stat_highlights_data <- subset(stat_highlights_data, criteria_vals == 1)
-#     if (nrow(filtered_stat_highlights_data) > 0) {
-#       p <- p +
-#         geom_point(
-#           data = filtered_stat_highlights_data,
-#           aes(x = x_vals, y = y_vals),
-#           size = 1, shape = 20, show.legend = FALSE
-#         ) +
-#         labs(x = NULL, y = NULL)
-#     }
-#   }
-#   
-#   # Boxes
-#   if (projection != "UTM (default)" &&
-#       nrow(highlights_data) > 0 &&
-#       all(c("x1","x2","y1","y2") %in% names(highlights_data))) {
-#     highlights_data <- transform_box_df(
-#       df = highlights_data,
-#       x1col = "x1", x2col = "x2", y1col = "y1", y2col = "y2",
-#       projection = projection, center_lat = center_lat, center_lon = center_lon
-#     )
-#   }
-#   if (nrow(highlights_data) > 0 && all(c("x1","x2","y1","y2","color","type") %in% colnames(highlights_data))) {
-#     if (any(highlights_data$type == "Box")) {
-#       p <- p +
-#         geom_rect(
-#           data = subset(highlights_data, type == "Box"),
-#           aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2, colour = I(color)),
-#           fill = NA, size = 1, show.legend = FALSE, inherit.aes = FALSE
-#         )
-#     }
-#     
-#     if (any(highlights_data$type == "Filled")) {
-#       p <- p +
-#         geom_rect(
-#           data = subset(highlights_data, type == "Filled"),
-#           aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2, fill = I(color)),
-#           colour = NA, alpha = 0.5, show.legend = FALSE, inherit.aes = FALSE
-#         )
-#     }
-#     
-#     if (any(highlights_data$type == "Hatched")) {
-#       p <- p +
-#         geom_rect_pattern(
-#           data = subset(highlights_data, type == "Hatched"),
-#           aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2),
-#           pattern = "stripe",
-#           pattern_fill = subset(highlights_data, type == "Hatched")$color,
-#           pattern_spacing = 0.01, pattern_size = 0.1,
-#           pattern_colour = NA, fill = NA, colour = NA,
-#           show.legend = FALSE, inherit.aes = FALSE
-#         )
-#     }
-#     
-#   }
-#   
-#   return(p)
-# }
+.fix_user_geom <- function(g) {
+  if (is.null(g)) return(g)
+  old <- sf::sf_use_s2()
+  on.exit(sf::sf_use_s2(old), add = TRUE)
+  sf::sf_use_s2(FALSE)  # disable s2 during geometry repair
+  
+  g <- tryCatch(sf::st_make_valid(g), error = function(e) g)
+  # drop Z/M if present
+  g <- tryCatch(sf::st_zm(g, drop = TRUE, what = "ZM"), error = function(e) g)
+  # if it's a geometry collection, safely extract basic geometries
+  g <- tryCatch(sf::st_collection_extract(g, "GEOMETRY"), error = function(e) g)
+  
+  g
+}
 
+.shp_cache <- new.env(parent = emptyenv())
+
+get_cached_shp <- function(path) {
+  if (!exists(path, envir = .shp_cache, inherits = FALSE)) {
+    shp <- sf::st_read(path, quiet = TRUE)
+    if (is.na(sf::st_crs(shp))) {
+      shp <- sf::st_set_crs(shp, 4326)
+    } else {
+      shp <- sf::st_transform(shp, 4326)
+    }
+    shp <- .fix_user_geom(shp)
+    assign(path, shp, envir = .shp_cache)
+  }
+  get(path, envir = .shp_cache, inherits = FALSE)
+}
+
+`%||%` <- function(a, b) if (!is.null(a)) a else b
 
 
 plot_map <- function(data_input,
@@ -1806,12 +1463,12 @@ plot_map <- function(data_input,
                      show_mountains = FALSE,
                      label_mountains = FALSE) {
   
-  # --- sichere Defaults (verhindert 'v_col'/'v_unit' Fehler) ---
+  # --- Safe defaults ---
   v_col  <- viridis::viridis(11)
   v_unit <- ""
   title_size <- if (!is.null(titles) && !is.null(titles$map_title_size)) titles$map_title_size else 12
   
-  # --- Paletten/Einheiten je nach variable/mode überschreiben (wie zuvor) ---
+  # --- Palettes and units depending on variable/mode ---
   if (!is.null(variable)) {
     if (variable == "Temperature") {
       v_col <- rev(RColorBrewer::brewer.pal(11, "RdBu"))
@@ -1865,117 +1522,95 @@ plot_map <- function(data_input,
     }
   }
   
-  # --- Achsenbereich schnell & identisch (kein terra::values) ---
+  # --- Axis range ---
   if (is.null(axis_range)) {
     if (!is.null(mode) && mode == "Regression_p_values") {
       axis_range <- c(1e-3, 1)
     } else if (!is.null(mode) && mode == "SD ratio") {
       axis_range <- c(0, 1)
     } else {
-      g <- terra::global(data_input, fun = c("min","max"), na.rm = TRUE)
-      max_abs_z <- max(abs(unlist(g)))
+      # ACHTUNG: hier OHNE na.rm-Argument
+      vals <- terra::minmax(data_input)
+      mn <- vals[1, ]
+      mx <- vals[2, ]
+      # NAs erst hier ignorieren
+      max_abs_z <- max(abs(c(mn, mx)), na.rm = TRUE)
       axis_range <- c(-max_abs_z, max_abs_z)
     }
   }
   
-
-  # ---- Smart, artifact-safe clipping & simplification ----
   
+  # ---- Smart, artifact-safe clipping & simplification ----
   .should_clip <- function(lon_lat_range, projection) {
-    # never clip for non-UTM projections (orthographic/robin/laea often cross seams)
+    # don't clip for non-UTM projections (seams and long arcs become messy)
     if (!identical(projection, "UTM (default)")) return(FALSE)
     
     lon_min <- lon_lat_range[1]; lon_max <- lon_lat_range[2]
     lat_min <- lon_lat_range[3]; lat_max <- lon_lat_range[4]
     
-    # treat huge extents as "world": don't clip (prevents continent cuts & seam lines)
     lon_span <- abs(lon_max - lon_min)
     lat_span <- abs(lat_max - lat_min)
+    # treat very large extents as "global": do not clip
     if (lon_span >= 120 || lat_span >= 80) return(FALSE)
     
-    # if bbox touches antimeridian or crosses it -> don't clip
+    # avoid clipping close to the antimeridian
     if (lon_min <= -170 || lon_max >= 170) return(FALSE)
     
     TRUE
   }
   
   .safe_crop <- function(x, lon_lat_range, projection) {
+    # safely crop sf objects in geographic coordinates, guarding against s2 issues
     if (is.null(x) || !.should_clip(lon_lat_range, projection)) return(x)
     bbox <- sf::st_bbox(
       c(xmin = lon_lat_range[1], xmax = lon_lat_range[2],
         ymin = lon_lat_range[3], ymax = lon_lat_range[4]),
       crs = sf::st_crs(4326)
     )
-    # Crop in planar math to avoid s2/antimeridian artifacts;
-    # switch off s2 just for the crop, then restore previous setting.
     old_s2 <- sf::sf_use_s2()
     on.exit(sf::sf_use_s2(old_s2), add = TRUE)
     sf::sf_use_s2(FALSE)
     suppressWarnings({
       y <- tryCatch(sf::st_crop(x, bbox), error = function(e) x)
-      # Make valid to prevent hairline issues from invalid rings
       tryCatch(sf::st_make_valid(y), error = function(e) y)
     })
   }
   
-  # Simplify only when zoomed in a bit; tolerance tied to bbox span
   .maybe_simplify <- function(x, lon_lat_range, projection) {
+    # optional simplification to speed up rendering at moderate zoom levels
     if (is.null(x) || nrow(x) == 0) return(x)
     if (!.should_clip(lon_lat_range, projection)) return(x)
     
     lon_span <- abs(lon_lat_range[2] - lon_lat_range[1])
-    # modest tolerance (degrees); smaller at tight zooms, larger at mid zooms
-    tol <- max(0.02, min(0.2, lon_span / 200))  # ~0.02°–0.2°
+    tol <- max(0.02, min(0.2, lon_span / 200))
     suppressWarnings(sf::st_simplify(x, dTolerance = tol, preserveTopology = TRUE))
   }
   
-  # Unified helper used everywhere
   crop_sf <- function(x) {
+    # combined crop + optional simplification
     x <- .safe_crop(x, lon_lat_range, projection)
     .maybe_simplify(x, lon_lat_range, projection)
   }
   
-  # 1) Crop-only helper: NO simplify (avoids s2 path entirely)
   crop_sf_nosimplify <- function(x) {
+    # crop only, no simplification
     .safe_crop(x, lon_lat_range, projection)
   }
   
-  # 2) Robust fixer for uploaded shapefiles (planar, make valid, drop Z/M)
-  .fix_user_geom <- function(g) {
-    if (is.null(g)) return(g)
-    old <- sf::sf_use_s2()
-    on.exit(sf::sf_use_s2(old), add = TRUE)
-    sf::sf_use_s2(FALSE)  # avoid s2 during repair
-    
-    g <- tryCatch(sf::st_make_valid(g), error = function(e) g)
-    # drop Z/M if present (some historic sets have Z/M that confuse simplification)
-    g <- tryCatch(sf::st_zm(g, drop = TRUE, what = "ZM"), error = function(e) g)
-    # if it’s a geometry collection, extract polygons/lines safely
-    g <- tryCatch(sf::st_collection_extract(g, "GEOMETRY"), error = function(e) g)
-    
-    g
-  }
-
-  r <- data_input
-  if (terra::ncell(r) > 3e5) {          
-    r <- terra::aggregate(r, fact = 3) 
-  }
-  
-  p <- ggplot() +
+  # --- Raster layer ---
+  p <- ggplot2::ggplot() +
     tidyterra::geom_spatraster_contour_filled(
-      data = r,                           
-      aes(fill = after_stat(level_mid)),
-      bins = 20                          
+      data = data_input,
+      ggplot2::aes(fill = after_stat(level_mid)),
+      bins = 20
     ) +
-    labs(fill = v_unit)
+    ggplot2::labs(fill = v_unit)
   
-  
-  # --- Guides nur bauen, wenn nicht versteckt; sichere Größen verwenden ---
   if (isTRUE(hide_axis)) {
-    p <- p + guides(fill = "none")
+    p <- p + ggplot2::guides(fill = "none")
   } else {
-    p <- p + guides(
-      fill = guide_colorbar(
+    p <- p + ggplot2::guides(
+      fill = ggplot2::guide_colorbar(
         barwidth = 2,
         barheight = grid::unit(0.75, "npc"),
         title = v_unit,
@@ -1991,15 +1626,14 @@ plot_map <- function(data_input,
     )
   }
   
-  # --- Skalen (wie zuvor) ---
   if (!is.null(mode) && mode == "Regression_p_values") {
-    p <- p + scale_fill_gradientn(
+    p <- p + ggplot2::scale_fill_gradientn(
       colors = v_col, trans = "log10", limits = axis_range,
       breaks = c(0.001, 0.01, 0.1, 1),
       labels = scales::label_comma(accuracy = 0.001)
     )
   } else {
-    p <- p + scale_fill_stepsn(
+    p <- p + ggplot2::scale_fill_stepsn(
       limits = axis_range, colors = v_col, n.breaks = 20, nice.breaks = TRUE,
       labels = function(breaks) {
         labels <- as.character(round(breaks, 2))
@@ -2010,23 +1644,33 @@ plot_map <- function(data_input,
     )
   }
   
-  # --- Theme (unverändert semantisch) ---
   p <- p + if (projection == "UTM (default)") ggplot2::theme_bw() else ggplot2::theme_minimal()
   
-  # --- statische Layer (vorher bbox-clipping) ---
+  # --- Static base layers (coastlines, land, borders, oceans) ---
   p <- p + ggplot2::geom_sf(data = crop_sf(coast), color = "#333333", size = 0.5, inherit.aes = FALSE)
-  if (isTRUE(white_ocean)) p <- p + ggplot2::geom_sf(data = crop_sf(oceans), fill = "#DDDDDD", size = 0.5, inherit.aes = FALSE)
-  if (isTRUE(white_land))
-    p <- p + ggplot2::geom_sf(data = crop_sf_nosimplify(land),
-                              fill = "#DDDDDD", color = NA, inherit.aes = FALSE)
-  if (isTRUE(c_borders))   p <- p + ggplot2::geom_sf(data = crop_sf(countries), color = "#333333", fill = NA, size = 0.5, inherit.aes = FALSE)
+  if (isTRUE(white_ocean)) {
+    p <- p + ggplot2::geom_sf(data = crop_sf(oceans), fill = "#DDDDDD", size = 0.5, inherit.aes = FALSE)
+  }
+  if (isTRUE(white_land)) {
+    p <- p + ggplot2::geom_sf(
+      data = crop_sf_nosimplify(land),
+      fill = "#DDDDDD", color = NA, inherit.aes = FALSE
+    )
+  }
+  if (isTRUE(c_borders)) {
+    p <- p + ggplot2::geom_sf(
+      data = crop_sf(countries),
+      color = "#333333", fill = NA, size = 0.5, inherit.aes = FALSE
+    )
+  }
   
-  # --- optionale Features (robust gegen NA via isTRUE) ---
+  # --- Optional rivers, lakes, mountains ---
   if (isTRUE(show_rivers)) {
-    p <- p + ggplot2::geom_sf(data = crop_sf(rivers), color = "#2A52BE", size = 0.2, inherit.aes = FALSE)
-    if (isTRUE(label_rivers) && "name" %in% names(rivers)) {
+    rv <- crop_sf(rivers)
+    p <- p + ggplot2::geom_sf(data = rv, color = "#2A52BE", size = 0.2, inherit.aes = FALSE)
+    if (isTRUE(label_rivers) && "name" %in% names(rv)) {
       p <- p + ggplot2::geom_text(
-        data = sf::st_centroid(rivers),
+        data = sf::st_centroid(rv),
         ggplot2::aes(label = name, geometry = geometry),
         stat = "sf_coordinates", size = 5, color = "black", inherit.aes = FALSE
       )
@@ -2035,9 +1679,9 @@ plot_map <- function(data_input,
   if (isTRUE(show_lakes)) {
     lk <- crop_sf(lakes)
     p <- p + ggplot2::geom_sf(data = lk, fill = "#DDDDDD", color = NA, inherit.aes = FALSE)
-    if (isTRUE(label_lakes) && "name" %in% names(lakes)) {
+    if (isTRUE(label_lakes) && "name" %in% names(lk)) {
       p <- p + ggplot2::geom_text(
-        data = sf::st_point_on_surface(lakes),
+        data = sf::st_point_on_surface(lk),
         ggplot2::aes(label = name, geometry = geometry),
         stat = "sf_coordinates", size = 5, color = "black", nudge_x = -1,
         inherit.aes = FALSE
@@ -2047,9 +1691,9 @@ plot_map <- function(data_input,
   if (isTRUE(show_mountains)) {
     mt <- crop_sf(mountains)
     p <- p + ggplot2::geom_sf(data = mt, color = "#333333", size = 3, shape = 17, inherit.aes = FALSE)
-    if (isTRUE(label_mountains) && "name" %in% names(mountains)) {
+    if (isTRUE(label_mountains) && "name" %in% names(mt)) {
       p <- p + ggplot2::geom_text(
-        data = mountains,
+        data = mt,
         ggplot2::aes(label = name, geometry = geometry),
         stat = "sf_coordinates", size = 5, color = "black", nudge_y = 0.75,
         inherit.aes = FALSE
@@ -2057,55 +1701,80 @@ plot_map <- function(data_input,
     }
   }
   
-  # --- Shapefiles wie gehabt (kein Interface-Change); nur gezeichnet, wenn gesetzt ---
+  # --- User shapefiles (order + colors controlled via UI) ---
   color_picker_prefix <- plotType
-  if (!is.null(shpOrder) && !is.null(plotOrder) && length(shpOrder) > 0 && length(plotOrder) > 0) {
+  if (!is.null(shpOrder) && !is.null(plotOrder) &&
+      length(shpOrder) > 0 && length(plotOrder) > 0) {
     shpOrder <- shpOrder[!duplicated(shpOrder)]
     selected_files <- plotOrder[match(shpOrder, tools::file_path_sans_ext(basename(plotOrder)))]
     for (file in selected_files) {
       file_name <- tools::file_path_sans_ext(basename(file))
       message(paste("Adding shapefile to plot:", file_name))
-      shape <- sf::st_read(file, quiet = TRUE)
-      if (is.na(sf::st_crs(shape))) shape <- sf::st_set_crs(shape, sf::st_crs(4326)) else shape <- sf::st_transform(shape, 4326)
       
-      shape <- .fix_user_geom(shape)          # <-- new
-      shape <- crop_sf_nosimplify(shape)      # <-- new (no simplify for user layers)
+      shape <- get_cached_shp(file)
+      shape <- crop_sf_nosimplify(shape)
       
       col_pick <- input[[paste0(color_picker_prefix, file_name)]]
       if (is.null(col_pick) || is.na(col_pick) || !nzchar(col_pick)) col_pick <- "black"
       
       geom_type <- as.character(sf::st_geometry_type(shape))
       if (any(geom_type %in% c("POLYGON", "MULTIPOLYGON"))) {
-        p <- p + ggplot2::geom_sf(data = shape, fill = NA, colour = col_pick, linewidth = 0.5, inherit.aes = FALSE)
+        p <- p + ggplot2::geom_sf(
+          data = shape, fill = NA, colour = col_pick,
+          linewidth = 0.5, inherit.aes = FALSE
+        )
       } else if (any(geom_type %in% c("LINESTRING", "MULTILINESTRING"))) {
-        p <- p + ggplot2::geom_sf(data = shape, colour = col_pick, linewidth = 0.5, inherit.aes = FALSE)
+        p <- p + ggplot2::geom_sf(
+          data = shape, colour = col_pick,
+          linewidth = 0.5, inherit.aes = FALSE
+        )
       } else if (any(geom_type %in% c("POINT", "MULTIPOINT"))) {
-        p <- p + ggplot2::geom_sf(data = shape, colour = col_pick, size = 2, inherit.aes = FALSE)
+        p <- p + ggplot2::geom_sf(
+          data = shape, colour = col_pick,
+          size = 2, inherit.aes = FALSE
+        )
       }
     }
   }
   
-  # --- Projektion / Ausschnitt (wie zuvor) ---
+  # --- Projection handling and map extent ---
   if (projection == "Robinson") {
     p <- p + ggplot2::coord_sf(crs = sf::st_crs("+proj=robin"), clip = "on")
   } else if (projection == "Orthographic") {
-    formula <- paste0("+proj=ortho +lat_0=", center_lat, " +lon_0=", center_lon,
-                      " +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs")
+    formula <- paste0(
+      "+proj=ortho +lat_0=", center_lat,
+      " +lon_0=", center_lon,
+      " +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
+    )
     p <- p + ggplot2::coord_sf(crs = sf::st_crs(formula), clip = "on")
   } else if (projection == "LAEA") {
-    formula <- paste0("+proj=laea +lat_0=0 +lon_0=0 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs")
+    formula <- paste0(
+      "+proj=laea +lat_0=0 +lon_0=0",
+      " +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs"
+    )
     p <- p + ggplot2::coord_sf(crs = sf::st_crs(formula), clip = "on")
   } else {
-    if (lon_lat_range[1]==lon_lat_range[2]) { lon_lat_range[1] <- lon_lat_range[1]-0.5; lon_lat_range[2] <- lon_lat_range[2]+0.5 }
-    if (lon_lat_range[3]==lon_lat_range[4]) { lon_lat_range[3] <- lon_lat_range[3]-0.5; lon_lat_range[4] <- lon_lat_range[4]+0.5 }
+    if (lon_lat_range[1] == lon_lat_range[2]) {
+      lon_lat_range[1] <- lon_lat_range[1] - 0.5
+      lon_lat_range[2] <- lon_lat_range[2] + 0.5
+    }
+    if (lon_lat_range[3] == lon_lat_range[4]) {
+      lon_lat_range[3] <- lon_lat_range[3] - 0.5
+      lon_lat_range[4] <- lon_lat_range[4] + 0.5
+    }
     lon_lat_range[1] <- max(lon_lat_range[1], -179.0625)
     lon_lat_range[2] <- min(lon_lat_range[2],  177.1875)
     lon_lat_range[3] <- max(lon_lat_range[3],  -87.64735)
     lon_lat_range[4] <- min(lon_lat_range[4],   87.64735)
-    p <- p + ggplot2::coord_sf(xlim = lon_lat_range[1:2], ylim = lon_lat_range[3:4], expand = FALSE, clip = "on")
+    p <- p + ggplot2::coord_sf(
+      xlim = lon_lat_range[1:2],
+      ylim = lon_lat_range[3:4],
+      expand = FALSE,
+      clip = "on"
+    )
   }
   
-  # --- Titel/Untertitel (robust) ---
+  # --- Titles and text styling ---
   if (!is.null(titles)) {
     if (titles$map_title != " " || titles$map_subtitle != " ") {
       p <- p + ggplot2::labs(
@@ -2114,18 +1783,27 @@ plot_map <- function(data_input,
       )
     }
     p <- p + ggplot2::theme(
-      plot.title = ggtext::element_textbox_simple(size = title_size, face = "bold", margin = ggplot2::margin(5,0,5,0)),
-      plot.subtitle = ggtext::element_textbox_simple(size = title_size/1.3, face = "plain", margin = ggplot2::margin(9,0,12,0)),
+      plot.title = ggtext::element_textbox_simple(
+        size = title_size, face = "bold",
+        margin = ggplot2::margin(5, 0, 5, 0)
+      ),
+      plot.subtitle = ggtext::element_textbox_simple(
+        size = title_size / 1.3, face = "plain",
+        margin = ggplot2::margin(9, 0, 12, 0)
+      ),
       axis.text = ggplot2::element_text(size = title_size / 1.6)
     )
   }
   
-  # --- ggplot_build() nur falls wirklich für Punkte nötig ---
-  need_points <- (nrow(points_data) > 0 && all(c("x_value","y_value","color","shape","size","label") %in% names(points_data)))
+  # --- Points and labels (only if provided) ---
+  need_points <- (
+    nrow(points_data) > 0 &&
+      all(c("x_value", "y_value", "color", "shape", "size", "label") %in% names(points_data))
+  )
   if (need_points) {
-    built <- ggplot_build(p)
+    built <- ggplot2::ggplot_build(p)
     pp <- built$layout$panel_params[[1]]
-    get_range <- function(pp, axis = c("x","y")) {
+    get_range <- function(pp, axis = c("x", "y")) {
       axis <- match.arg(axis)
       if (!is.null(pp[[paste0(axis, ".range")]])) {
         pp[[paste0(axis, ".range")]]
@@ -2138,7 +1816,6 @@ plot_map <- function(data_input,
     xlim_cur <- get_range(pp, "x")
     ylim_cur <- get_range(pp, "y")
     
-    # Projection transform
     if (projection != "UTM (default)") {
       points_data <- transform_points_df(
         df = points_data,
@@ -2149,16 +1826,22 @@ plot_map <- function(data_input,
     
     points_data$x_value <- as.numeric(points_data$x_value)
     points_data$y_value <- as.numeric(points_data$y_value)
-    inside <- with(points_data, !is.na(x_value) & !is.na(y_value) &
-                     x_value >= xlim_cur[1] & x_value <= xlim_cur[2] &
-                     y_value >= ylim_cur[1] & y_value <= ylim_cur[2])
+    inside <- with(
+      points_data,
+      !is.na(x_value) & !is.na(y_value) &
+        x_value >= xlim_cur[1] & x_value <= xlim_cur[2] &
+        y_value >= ylim_cur[1] & y_value <= ylim_cur[2]
+    )
     points_in <- points_data[inside, , drop = FALSE]
     
     if (nrow(points_in) > 0) {
       p <- p +
         ggplot2::geom_point(
           data = points_in,
-          ggplot2::aes(x = x_value, y = y_value, colour = I(color), shape = I(shape), size = I(size)),
+          ggplot2::aes(
+            x = x_value, y = y_value,
+            colour = I(color), shape = I(shape), size = I(size)
+          ),
           show.legend = FALSE, inherit.aes = FALSE
         ) +
         ggrepel::geom_text_repel(
@@ -2174,35 +1857,29 @@ plot_map <- function(data_input,
     }
   }
   
-  # --- stat highlights / boxes ---
-  if (nrow(stat_highlights_data) > 0) {
-    filtered_stat_highlights_data <- subset(stat_highlights_data, criteria_vals == 1)
-    if (nrow(filtered_stat_highlights_data) > 0) {
-      p <- p +
-        ggplot2::geom_point(
-          data = filtered_stat_highlights_data,
-          ggplot2::aes(x = x_vals, y = y_vals),
-          size = 1, shape = 20, show.legend = FALSE
-        ) +
-        ggplot2::labs(x = NULL, y = NULL)
-    }
-  }
-  
+  # --- Highlight rectangles (boxes, filled, hatched) ---
   if (projection != "UTM (default)" &&
       nrow(highlights_data) > 0 &&
       all(c("x1","x2","y1","y2") %in% names(highlights_data))) {
     highlights_data <- transform_box_df(
       df = highlights_data,
-      x1col = "x1", x2col = "x2", y1col = "y1", y2col = "y2",
+      x1col = "x1", x2col = "x2",
+      y1col = "y1", y2col = "y2",
       projection = projection, center_lat = center_lat, center_lon = center_lon
     )
   }
-  if (nrow(highlights_data) > 0 && all(c("x1","x2","y1","y2","color","type") %in% colnames(highlights_data))) {
+  
+  if (nrow(highlights_data) > 0 &&
+      all(c("x1","x2","y1","y2","color","type") %in% colnames(highlights_data))) {
     if (any(highlights_data$type == "Box")) {
       p <- p +
         ggplot2::geom_rect(
           data = subset(highlights_data, type == "Box"),
-          ggplot2::aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2, colour = I(color)),
+          ggplot2::aes(
+            xmin = x1, xmax = x2,
+            ymin = y1, ymax = y2,
+            colour = I(color)
+          ),
           fill = NA, size = 1, show.legend = FALSE, inherit.aes = FALSE
         )
     }
@@ -2210,15 +1887,23 @@ plot_map <- function(data_input,
       p <- p +
         ggplot2::geom_rect(
           data = subset(highlights_data, type == "Filled"),
-          ggplot2::aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2, fill = I(color)),
-          colour = NA, alpha = 0.5, show.legend = FALSE, inherit.aes = FALSE
+          ggplot2::aes(
+            xmin = x1, xmax = x2,
+            ymin = y1, ymax = y2,
+            fill = I(color)
+          ),
+          colour = NA, alpha = 0.5,
+          show.legend = FALSE, inherit.aes = FALSE
         )
     }
     if (any(highlights_data$type == "Hatched")) {
       p <- p +
         ggpattern::geom_rect_pattern(
           data = subset(highlights_data, type == "Hatched"),
-          ggplot2::aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2),
+          ggplot2::aes(
+            xmin = x1, xmax = x2,
+            ymin = y1, ymax = y2
+          ),
           pattern = "stripe",
           pattern_fill = subset(highlights_data, type == "Hatched")$color,
           pattern_spacing = 0.01, pattern_size = 0.1,
@@ -2230,8 +1915,6 @@ plot_map <- function(data_input,
   
   return(p)
 }
-
-`%||%` <- function(a, b) if (!is.null(a)) a else b
 
 #' (General) CREATE MAP DATATABLE
 #' 
