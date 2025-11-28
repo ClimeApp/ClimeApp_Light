@@ -201,7 +201,7 @@ ui <- navbarPage(
                    style = "border: 5px solid #094030; padding: 10px; border-radius: 5px; color: #094030; background-color: white;",
                    h5(strong("Notice", style = "color: #094030;")),
                    h5(
-                     "This is ", strong("ClimeApp Light."), "Download the full desktop version ",
+                     "This is ", strong("ClimeApp Light."), "Initial plots might take longer to load. Download the full desktop version ",
                      actionLink("go_desktop2", tags$strong("here."))
                    )
                  ), 
@@ -431,7 +431,8 @@ ui <- navbarPage(
                                     tags$ul(
                                       tags$li("Regression analysis"),
                                       tags$li("Annual cycle analysis"),
-                                      tags$li("Custom statistics (SD ratio, % sign match)")
+                                      tags$li("Custom statistics (SD ratio, % sign match)"),
+                                      tags$li("Pre-loaded and pre-processed data")
                                     ),
                                     br(),
                                     downloadButton("climeapp_desktop_download",
@@ -447,6 +448,27 @@ ui <- navbarPage(
                            #### Tab Version History ----
                            tabPanel("Version history",
                                     br(), br(),
+                                    h5(strong("ClimeApp (light) (28.11.2025)", style = "color: #094030;")),
+                                    tags$ul(
+                                      tags$li("Creation of a light and more stable version for online use"),
+                                      tags$li("Relocation of regression, annual cycles and statistics features to desktop version"),
+                                      tags$li("Removal of pre-loaded data"),
+                                      tags$li(a("View code on GitHub", 
+                                                href = "https://github.com/ClimeApp/ClimeApp_Light/tree/", 
+                                                target = "_blank")),
+                                    ),
+                                    br(),
+                                    h5(strong("v1.5 (28.11.2025)", style = "color: #094030;")),
+                                    tags$ul(
+                                      tags$li("Addition of welcome video and tutorials"),
+                                      tags$li("Balanced library loading"),
+                                      tags$li("Plot caching"),
+                                      tags$li("Improved map plotting function"),
+                                      tags$li(a("View code on GitHub", 
+                                                href = "https://github.com/ClimeApp/ClimeApp_development/tree/ClimeApp_v1.5", 
+                                                target = "_blank")),
+                                    ),
+                                    br(),
                                     h5(strong("v1.4 (18.07.2025)", style = "color: #094030;")),
                                     tags$ul(
                                       tags$li("General overhaul of ClimeApp"),
