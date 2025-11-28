@@ -5858,13 +5858,9 @@ server <- function(input, output, session) {
   
    ###### Cached Plot 
   output$map <- renderCachedPlot({
-    start_time <- Sys.time()
     req(map_dimensions()[1], map_dimensions()[2])
     
     p <- map_plot()
-    
-    end_time <- Sys.time()
-    message("Map generated in ", round(end_time - start_time, 3), " seconds")
     p
   },
   
