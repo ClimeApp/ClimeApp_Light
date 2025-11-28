@@ -454,7 +454,7 @@ ui <- navbarPage(
                                       tags$li("Relocation of regression, annual cycles and statistics features to desktop version"),
                                       tags$li("Removal of pre-loaded data"),
                                       tags$li(a("View code on GitHub", 
-                                                href = "https://github.com/ClimeApp/ClimeApp_Light/tree/ClimeApp_Light", 
+                                                href = "https://github.com/ClimeApp/ClimeApp_Light/tree/ClimeAppLight", 
                                                 target = "_blank")),
                                     ),
                                     br(),
