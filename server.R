@@ -6143,39 +6143,86 @@ server <- function(input, output, session) {
     pagingType = "numbers"
   ))
   
-  timeseries_plot_anom<- function(){
+  # timeseries_plot_anom<- function(){
+  #   
+  #   #Plot normal timeseries if year range is > 1 year
+  #   if (input$range_years[1] != input$range_years[2]){
+  #     # Generate NA or reference mean
+  #     ref_ts = signif(mean(data_output3_primary()),3)
+  #   } else {
+  #     ref_ts = NA
+  #   }
+  #   
+  #   # New 
+  #   p <- plot_timeseries(
+  #     type = "Anomaly",
+  #     data = timeseries_data(),
+  #     variable = input$variable_selected,
+  #     ref = ref_ts,
+  #     year_range = input$range_years,
+  #     month_range_1 = month_range_primary(),
+  #     titles = plot_titles(),
+  #     show_key = input$show_key_ts,
+  #     key_position = input$key_position_ts,
+  #     show_ref = input$show_ref_ts,
+  #     show_ticks = input$show_ticks_ts,
+  #     tick_interval = input$xaxis_numeric_interval_ts,
+  #     moving_ave = input$custom_average_ts,
+  #     moving_ave_year = input$year_moving_ts,
+  #     custom_percentile = input$custom_percentile_ts,
+  #     percentiles = input$percentile_ts,
+  #     highlights = ts_highlights_data(),
+  #     lines = ts_lines_data(),
+  #     points = ts_points_data(),
+  #     axis_range = input$axis_input_ts
+  #   )
+  #   
+  #   return(p)
+  # }
+  
+  timeseries_plot_anom <- function() {
     
-    #Plot normal timeseries if year range is > 1 year
-    if (input$range_years[1] != input$range_years[2]){
-      # Generate NA or reference mean
-      ref_ts = signif(mean(data_output3_primary()),3)
+    if (input$range_years[1] != input$range_years[2]) {
+      # Multi-year: normal anomaly TS
+      ref_ts <- signif(mean(data_output3_primary()), 3)
+      
+      p <- plot_timeseries(
+        type = "Anomaly",
+        data = timeseries_data(),
+        variable = input$variable_selected,
+        ref = ref_ts,
+        year_range = input$range_years,
+        month_range_1 = month_range_primary(),
+        titles = plot_titles(),
+        show_key = input$show_key_ts,
+        key_position = input$key_position_ts,
+        show_ref = input$show_ref_ts,
+        show_ticks = input$show_ticks_ts,
+        tick_interval = input$xaxis_numeric_interval_ts,
+        moving_ave = input$custom_average_ts,
+        moving_ave_year = input$year_moving_ts,
+        custom_percentile = input$custom_percentile_ts,
+        percentiles = input$percentile_ts,
+        highlights = ts_highlights_data(),
+        lines = ts_lines_data(),
+        points = ts_points_data(),
+        axis_range = input$axis_input_ts
+      )
+      
     } else {
       ref_ts = NA
+      
+      p <-   plot_monthly_timeseries(
+        data = timeseries_data(),
+        titles = plot_titles(),
+        show_key = FALSE,
+        key_position = "none",
+        highlights = ts_highlights_data(),
+        lines = ts_lines_data(),
+        points = ts_points_data()
+      )
+      
     }
-    
-    # New 
-    p <- plot_timeseries(
-      type = "Anomaly",
-      data = timeseries_data(),
-      variable = input$variable_selected,
-      ref = ref_ts,
-      year_range = input$range_years,
-      month_range_1 = month_range_primary(),
-      titles = plot_titles(),
-      show_key = input$show_key_ts,
-      key_position = input$key_position_ts,
-      show_ref = input$show_ref_ts,
-      show_ticks = input$show_ticks_ts,
-      tick_interval = input$xaxis_numeric_interval_ts,
-      moving_ave = input$custom_average_ts,
-      moving_ave_year = input$year_moving_ts,
-      custom_percentile = input$custom_percentile_ts,
-      percentiles = input$percentile_ts,
-      highlights = ts_highlights_data(),
-      lines = ts_lines_data(),
-      points = ts_points_data(),
-      axis_range = input$axis_input_ts
-    )
     
     return(p)
   }
