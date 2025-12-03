@@ -157,7 +157,7 @@ ui <- navbarPage(
   
   
   # --- Navbar styling and properties ---
-  theme = bslib::bs_theme(version = 5, bootswatch = "united", primary = "#094030", navbar_bg = "#094030"),
+  theme = my_theme,
   position = "fixed-top",
   windowTitle = "ClimeApp",
   collapsible = TRUE,

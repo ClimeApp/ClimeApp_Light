@@ -80,7 +80,6 @@ setup_user_environment()
 
 # Load only REQUIRED functions/libraries:
 
-  # Load only REQUIRED functions/libraries:
   #Packages
   
   library(shiny, lib.loc = lib_path)
@@ -128,7 +127,7 @@ addResourcePath(prefix = 'pics', directoryPath = "www")
 addResourcePath(prefix = 'videos', directoryPath = "videos")
 
 # Choosing theme and making colouring changes
-#my_theme <- bslib::bs_theme(version = 5, bootswatch = "united", primary = "#094030")
+my_theme <- bslib::bs_theme(version = 5, bootswatch = "united", primary = "#094030", navbar_bg = "#094030")
 
 # Colour palette and variable names for ModE-RA source leaflet
 type_list <- c("bivalve_proxy", "coral_proxy", "documentary_proxy", "glacier_ice_proxy", "ice_proxy", "instrumental_data", "lake_sediment_proxy", "other_proxy", "speleothem_proxy", "tree_proxy")
@@ -210,6 +209,7 @@ initial_year_values = century_years[,random_century]
 ## Load grid square weights for calculating means
 latlon_weights = as.matrix(read.csv("data/latlon_weights.csv"))
 
+# Load RDS Files for map creation (rnaturalearth)
 coast <- readRDS("data/geodata_maps/coast.rds")
 countries <- readRDS("data/geodata_maps/countries.rds")
 oceans <- readRDS("data/geodata_maps/oceans.rds")
@@ -221,3 +221,30 @@ mountains <- readRDS("data/geodata_custom_maps/mountains.rds")
 rivers <- readRDS("data/geodata_custom_maps/rivers.rds")
 
 
+# =====================================================================
+# Pre-validate static sf layers (coast, countries, land, oceans, rivers)
+# =====================================================================
+
+fix_static_geom <- function(x) {
+  if (is.null(x)) return(x)
+  
+  # Ensure CRS exists and is in WGS-84
+  if (is.na(sf::st_crs(x))) {
+    x <- sf::st_set_crs(x, 4326)
+  } else if (sf::st_crs(x)$epsg != 4326) {
+    x <- sf::st_transform(x, 4326)
+  }
+  
+  # Reuse your proven geometry fixer: make_valid, drop Z/M, extract geometries
+  .fix_user_geom(x)
+}
+
+coast     <- fix_static_geom(coast)
+countries <- fix_static_geom(countries)
+oceans    <- fix_static_geom(oceans)
+land      <- fix_static_geom(land)
+
+# Optional but recommended for consistency:
+rivers    <- fix_static_geom(rivers)
+lakes     <- fix_static_geom(lakes)
+mountains <- fix_static_geom(mountains)
