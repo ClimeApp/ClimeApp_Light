@@ -27,7 +27,7 @@ ui <- navbarPage(
       width  = logo_width,
       style  = "height:75px; width:auto; margin-right:5px; display:inline-block;"
     ),
-    span("(light)")
+    span("Light")
   ),
   
   # Global CSS injection for hiding Shiny errors
