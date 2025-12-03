@@ -448,7 +448,7 @@ ui <- navbarPage(
                            #### Tab Version History ----
                            tabPanel("Version history",
                                     br(), br(),
-                                    h5(strong("ClimeApp (light) (28.11.2025)", style = "color: #094030;")),
+                                    h5(strong("ClimeApp Light (28.11.2025)", style = "color: #094030;")),
                                     tags$ul(
                                       tags$li("Creation of a light and more stable version for online use"),
                                       tags$li("Relocation of regression, annual cycles and statistics features to desktop version"),
