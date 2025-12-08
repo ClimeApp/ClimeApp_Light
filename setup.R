@@ -8,26 +8,26 @@ Sys.info()[["user"]]
 ## Working Directory
 # Define a function to set up user configurations
 setup_user_environment <- function() {
-  
+
   # Define user-specific settings
   user_configs <- list(
-    
+
     # Nik
     nbartlome = list(
       setwd = "C:/Users/nbartlome/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp",
       lib_path = "C:/Users/nbartlome/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp/library"
     ),
-    
+
     nikla = list(
       setwd = "C:/Users/nikla/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp",
       lib_path = "C:/Users/nikla/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp/library"
     ),
-    
+
     "Niklaus Emanuel" = list(
       setwd = "H:/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp",
       lib_path = "H:/OneDrive/1_Universit\u00E4t/4_PhD/10_R with R/Shiny R/ClimeApp_all/ClimeApp/library"
     ),
-    
+
     # Richard
     Richard = list(
       setwd = "C:/Users/Richard/OneDrive/ClimeApp_all/ClimeApp",
@@ -37,7 +37,7 @@ setup_user_environment <- function() {
       setwd = "C:/Users/rw22z389/OneDrive/ClimeApp_all/ClimeApp",
       lib_path = "C:/Users/rw22z389/OneDrive/ClimeApp_all/ClimeApp/library"
     ),
-    
+
     # Noémie
     noemi = list(
       setwd = "C:/Users/noemi/OneDrive/ClimeApp_all-noemie-hp/ClimeApp/",
@@ -47,7 +47,7 @@ setup_user_environment <- function() {
       setwd = "C:/Users/nw22d367/OneDrive/ClimeApp_all/ClimeApp/",
       lib_path = "C:/Users/nw22d367/OneDrive/ClimeApp_all/ClimeApp/library"
     ),
-    
+
     # Tanja
     falasca = list(
       setwd = "C:/Users/falasca/OneDrive/ClimeApp_all/ClimeApp/",
@@ -221,10 +221,7 @@ mountains <- readRDS("data/geodata_custom_maps/mountains.rds")
 rivers <- readRDS("data/geodata_custom_maps/rivers.rds")
 
 
-# =====================================================================
 # Pre-validate static sf layers (coast, countries, land, oceans, rivers)
-# =====================================================================
-
 fix_static_geom <- function(x) {
   if (is.null(x)) return(x)
   

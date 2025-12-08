@@ -1292,6 +1292,10 @@ generate_titles = function(tab,
   # Netcdf title
   netcdf_title = gsub(paste(variable),"NCDF-Data",file_title)
   
+  # Title font size
+  map_title_size <- ifelse(map_title_mode == "Custom", map_title_size, 18)
+  ts_title_size <- ifelse(ts_title_mode == "Custom", ts_title_size, 18)
+  
   # Combine into dataframe
   m_titles = data.frame(
     map_title,
@@ -1539,7 +1543,7 @@ plot_map <- function(data_input,
     }
   }
   
-  # ---- Smart, artifact-safe clipping & simplification ----
+  # Smart, artifact-safe clipping & simplification
   .should_clip <- function(lon_lat_range, projection) {
     # don't clip for non-UTM projections (seams and long arcs become messy)
     if (!identical(projection, "UTM (default)")) return(FALSE)
@@ -2187,7 +2191,7 @@ add_stats_to_TS_datatable = function(data_input,
 }
 
 
-#' PLOT TIMESERIES 
+#### PLOT TIMESERIES ####
 #'
 #' This function sets up time series plots based on the specified type.
 #'
@@ -2217,647 +2221,6 @@ add_stats_to_TS_datatable = function(data_input,
 #'
 #' @return A ggplot object.
 
-# plot_timeseries <- function(type,
-#                             mode = NA,
-#                             data = NA,
-#                             variable = NA,
-#                             data_v1 = NA,
-#                             data_v2 = NA,
-#                             variable1 = NA,
-#                             variable2 = NA,
-#                             ref = NA,
-#                             year_range = NA,
-#                             month_range_1 = NA,
-#                             month_range_2 = NA,
-#                             titles = NA,
-#                             #titles_mode=NA, titles_corr=NA, titles_reg=NA, titles_custom=NA,
-#                             show_key = FALSE,
-#                             key_position = NA,
-#                             show_ref = FALSE,
-#                             show_ticks = FALSE,
-#                             tick_interval = NA,
-#                             moving_ave = FALSE,
-#                             moving_ave_year = NA,
-#                             custom_percentile = FALSE,
-#                             percentiles = NA,
-#                             highlights = NA,
-#                             lines = NA,
-#                             points = NA,
-#                             axis_range = NULL)
-# {
-#   
-#   # Create empty dataframes for Lines, Points, Fills and boxes  
-#   lines_data = data.frame(matrix(ncol = 8, nrow = 0))
-#   colnames(lines_data) = c("ID","label","x","y","lcolor","ltype","lwidth","key_show")
-#   
-#   points_data = data.frame(matrix(ncol = 8, nrow = 0))
-#   colnames(points_data) = c("ID","label","x","y","pcolor","pshape","psize","key_show")
-#   
-#   fills_data = data.frame(matrix(ncol = 8, nrow = 0))
-#   colnames(points_data) = c("ID","label","x1","x2","y1","y2","fill","key_show")
-#   
-#   boxes_data = data.frame(matrix(ncol = 8, nrow = 0))
-#   colnames(points_data) = c("ID","label","x1","x2","y1","y2","bcolor","key_show")
-#   
-#   # Set up inital row IDs
-#   lID = 1 ; pID = 1 ; fID = 1 ; bID = 1
-#   
-#   # Extract ylimits from data
-#   if (type == "Correlation") {
-#     y_min = min(data_v1[, 2], na.rm = TRUE)
-#     y_max = max(data_v1[, 2], na.rm = TRUE)
-#   } else if (type == "Regression_Trend") {
-#     y_min = min(data[, c(2, 3)])
-#     y_max = max(data[, c(2, 3)])
-#   } else if (type == "Regression_Residual") {
-#     y_min = min(data[, 4])
-#     y_max = max(data[, 4])
-#   } else {
-#     y_min = min(data[, 2])
-#     y_max = max(data[, 2])
-#   }
-# 
-#   # Axis Range Setting with optional padding
-#   if (!is.null(axis_range) && length(axis_range) == 2 && !any(is.na(axis_range))) {
-#     # Apply padding even to user-specified range
-#     y_range <- axis_range[2] - axis_range[1]
-#     y_Min <- axis_range[1] - (0.1 * y_range)
-#     y_Max <- axis_range[2] + (0.1 * y_range)
-#   } else {
-#     # Auto mode
-#     y_range <- y_max - y_min
-#     y_Min <- y_min - (0.1 * y_range)
-#     y_Max <- y_max + (0.1 * y_range)
-#   }
-#   
-#   # Edit year range if required:
-#   if (type == "Composites"){
-#     year_range = range(year_range)
-#   }
-#   
-#   # Add a vertical white line to set axis limits 
-#   new_line = data.frame(
-#     ID = lID,
-#     label = NA,
-#     x = year_range[1],
-#     y = c(y_Min,y_Max),
-#     lcolor = "white",
-#     ltype = "solid",
-#     lwidth = 1,
-#     key_show = FALSE
-#   )
-#   lines_data = rbind(lines_data,new_line)
-#   lID = lID+1
-#   
-#   # Add custom lines to data:
-#   if (!is.null(lines) && nrow(lines) > 0) {
-#     
-#     for (i in 1:nrow(lines)) {
-#       line_data <- lines[i, ]
-#       
-#       if (line_data$orientation == "Vertical"){
-#         x_line = line_data$location
-#         y_line = c(y_Min,y_Max)
-#       } else { # Orientation == "Horizontal"
-#         x_line = year_range
-#         y_line = line_data$location
-#       }
-#       
-#       new_line = data.frame(
-#         ID = lID,
-#         label = line_data$label,
-#         x = x_line,
-#         y = y_line,
-#         lcolor = line_data$color,
-#         ltype = line_data$type,
-#         lwidth = 1,
-#         key_show = line_data$key_show
-#       )
-#       lines_data = rbind(lines_data,new_line)
-#       lID = lID+1
-#     }
-#   }
-#   
-#   # Add Percentile Lines
-#   if(custom_percentile){
-#     # Find column for percentiles
-#     if (moving_ave){
-#       percentile_column = 6  
-#     } else {
-#       percentile_column = 5  
-#     }
-#     
-#     # Add lower percentile
-#     lower_percentile = data.frame(
-#       ID = lID,
-#       label = gsub("_", " ",gsub("\\[.*?\\]", "", colnames(data)[percentile_column])),
-#       x = data$Year,
-#       y = data[,percentile_column],
-#       lcolor = "gold2",
-#       ltype = "solid",
-#       lwidth = 1,
-#       key_show = TRUE
-#     )
-#     lines_data = rbind(lines_data,lower_percentile)
-#     lID = lID+1
-#     
-#     # Add upper percentile
-#     upper_percentile = data.frame(
-#       ID = lID,
-#       label = gsub("_", " ",gsub("\\[.*?\\]", "", colnames(data)[percentile_column+1])),
-#       x = data$Year,
-#       y = data[,percentile_column+1],
-#       lcolor = "firebrick4",
-#       ltype = "solid",
-#       lwidth = 1,
-#       key_show = TRUE
-#     )
-#     lines_data = rbind(lines_data,upper_percentile)
-#     lID = lID+1
-#   }
-#   
-#   # Add main line/points to data:
-#   if (type == "Anomaly" || type == "Monthly") {
-#     new_line = data.frame(
-#       ID = lID,
-#       label = paste(generate_title_months(MR = month_range_1), variable, type),
-#       x = data$Year,
-#       y = data[,2],
-#       lcolor = get_variable_properties(variable)$color,
-#       ltype = "solid",
-#       lwidth = 1,
-#       key_show = TRUE
-#     )
-#     lines_data = rbind(lines_data,new_line)
-#     lID = lID+1
-#     
-#   } else if (type == "Correlation") {
-#     new_line = data.frame(
-#       ID = lID,
-#       label = titles$V1_axis_label,
-#       x = data_v1$Year,
-#       y = data_v1[,2],
-#       lcolor = titles$V1_color,
-#       ltype = "solid",
-#       lwidth = 1,
-#       key_show = TRUE
-#     )
-#     lines_data = rbind(lines_data,new_line)
-#     lID = lID+1
-#   } else if (type == "Composites") {
-#     new_point = data.frame(
-#       ID = pID,
-#       label = paste(generate_title_months(MR = month_range_1), variable, type),
-#       x = as.double(data$Year),
-#       y = data[,2],
-#       pcolor = get_variable_properties(variable)$color,
-#       pshape = "●",
-#       psize = as.integer(4),
-#       key_show = TRUE
-#     )
-#     points_data = rbind(points_data,new_point)
-#     pID = pID+1
-#   } else if (type =="Regression_Trend"){
-#     new_line = data.frame(
-#       ID = lID,
-#       label = "Original",
-#       x = data$Year,
-#       y = data[,2],
-#       lcolor = titles$color_d,
-#       ltype = "solid",
-#       lwidth = 1,
-#       key_show = TRUE
-#     )
-#     lines_data = rbind(lines_data,new_line)
-#     lID = lID+1  
-#   } else if (type =="Regression_Residual"){
-#     new_line = data.frame(
-#       ID = lID,
-#       label = "Residual",
-#       x = data$Year,
-#       y = data[,4],
-#       lcolor = titles$color_d,
-#       ltype = "dashed",
-#       lwidth = 1,
-#       key_show = TRUE
-#     )
-#     lines_data = rbind(lines_data,new_line)
-#     lID = lID+1  
-#   } else {
-#     stop("Invalid plot type")
-#   }# else if (type == "Regression"){} TBC #
-#   
-#   # Add secondary line to data:
-#   if (type == "Correlation") {
-#     # Convert data
-#     min_v1 <- y_min
-#     max_v1 <- y_max
-#     min_v2 <- min(data_v2[,2], na.rm = TRUE)
-#     max_v2 <- max(data_v2[,2], na.rm = TRUE)
-#     
-#     v2_adjusted <- (data_v2[,2] - min_v2) / (max_v2 - min_v2)  # normalize to [0, 1]
-#     v2_adjusted <- v2_adjusted * (max_v1 - min_v1) + min_v1     # scale to v1 range
-#     
-#     # add to lines
-#     new_line = data.frame(
-#       ID = lID,
-#       label = titles$V2_axis_label,
-#       x = data_v2$Year,
-#       y = v2_adjusted,
-#       lcolor = titles$V2_color,
-#       ltype = "solid",
-#       lwidth = 1,
-#       key_show = TRUE
-#     )
-#     lines_data = rbind(lines_data,new_line)
-#     lID = lID+1
-#   }
-#   
-#   if (type =="Regression_Trend"){
-#     new_line = data.frame(
-#       ID = lID,
-#       label = "Trend",
-#       x = data$Year,
-#       y = data[,3],
-#       lcolor = "black",
-#       ltype = "solid",
-#       lwidth = 1,
-#       key_show = TRUE
-#     )
-#     lines_data = rbind(lines_data,new_line)
-#     lID = lID+1  
-#   }
-#   
-#   # Add moving average line to data 
-#   if(moving_ave){
-#     # Add moving average data
-#     if (type=="Correlation"){
-#       average_line = data.frame(
-#         ID = lID,
-#         label = paste0(moving_ave_year,"-Yr Moving Average "),
-#         x = data_v1$Year,
-#         y = data_v1[,5],
-#         lcolor = titles$V1_color,
-#         ltype = "solid",
-#         lwidth = 1.5,
-#         key_show = TRUE
-#       )
-#       lines_data = rbind(lines_data,average_line)
-#       lID = lID+1
-#       
-#       average_line = data.frame(
-#         ID = lID,
-#         label = paste0(moving_ave_year,"-Yr Moving Average"),
-#         x = data_v2$Year,
-#         y = data_v2[,5],
-#         lcolor = titles$V2_color,
-#         ltype = "solid",
-#         lwidth = 1.5,
-#         key_show = TRUE
-#       )
-#       lines_data = rbind(lines_data,average_line)
-#       lID = lID+1
-#       
-#     } else {
-#       average_line = data.frame(
-#         ID = lID,
-#         label = paste0(moving_ave_year,"-Yr Moving Average"),
-#         x = data$Year,
-#         y = data[,5],
-#         lcolor = "black",
-#         ltype = "solid",
-#         lwidth = 1.5,
-#         key_show = TRUE
-#       )
-#       lines_data = rbind(lines_data,average_line)
-#       lID = lID+1
-#     }
-#   }
-#   
-#   # Add custom points to data:
-#   if (!is.null(points) && nrow(points) > 0) {
-#     
-#     for (i in 1:nrow(points)) {
-#       point_data <- points[i, ]
-#       
-#       new_point = data.frame(
-#         ID = pID,
-#         label = point_data$label,
-#         x = point_data$x_value,
-#         y = point_data$y_value,
-#         pcolor = point_data$color,
-#         pshape = point_data$shape,
-#         psize = point_data$size,
-#         key_show = FALSE
-#       )
-#       points_data = rbind(points_data,new_point)
-#       pID = pID+1
-#     }
-#   }
-#   
-#   # Add custom highlights to data:
-#   if (!is.null(highlights) && nrow(highlights) > 0) {
-#     
-#     if(any(highlights$type == "Fill")) {
-#       fills <- subset(highlights, type == "Fill")
-#       
-#       for (i in 1:nrow(fills)) {
-#         fill_data <- fills[i, ]
-#         
-#         new_fill = data.frame(
-#           ID = fID,
-#           label = fill_data$label,
-#           x1 = fill_data$x1,
-#           x2 = fill_data$x2,
-#           y1 = fill_data$y1,
-#           y2 = fill_data$y2,
-#           fill = fill_data$color,
-#           key_show = fill_data$key_show
-#         )
-#         fills_data = rbind(fills_data,new_fill)
-#         fID = fID+1
-#       }
-#     }
-#     
-#     if(any(highlights$type == "Box")) {
-#       boxes <- subset(highlights, type == "Box")
-#       
-#       for (i in 1:nrow(boxes)) {
-#         box_data <- boxes[i, ]
-#         
-#         new_box = data.frame(
-#           ID = bID,
-#           label = box_data$label,
-#           x1 = box_data$x1,
-#           x2 = box_data$x2,
-#           y1 = box_data$y1,
-#           y2 = box_data$y2,
-#           bcolor = box_data$color,
-#           key_show = box_data$key_show
-#         )
-#         boxes_data = rbind(boxes_data,new_box)
-#         bID = bID+1
-#       }
-#     }
-#     
-#   }
-#   
-#   # Plot data 
-#   p = ggplot()
-#   
-#   # Plot fills
-#   if (nrow(fills_data>0)){
-#     
-#     #Plot
-#     for (i in 1:(fID-1)){
-#       fill_data = subset(fills_data, ID == i)
-#       
-#       if (fill_data$key_show){ # Show on legend
-#         p = p +  geom_rect(
-#           data = fill_data,
-#           aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2, fill = label),
-#           alpha = 0.5,
-#           inherit.aes = FALSE
-#         ) 
-#       } else { # Don't show on legend
-#         p = p +  geom_rect(
-#           data = fill_data,
-#           aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2),
-#           fill = fill_data$fill,
-#           alpha = 0.5,
-#           inherit.aes = FALSE
-#         )  
-#       }
-#     }
-#     
-#     # Add legend
-#     fills_legend = unique(subset(fills_data, key_show == TRUE)[,c("ID","label","fill")])
-#     if (!is.null(fills_legend) && nrow(fills_legend)>0){
-#       p = p + scale_fill_manual(values = setNames(fills_legend$fill,fills_legend$label))
-#     }
-#   }
-#   
-#   # Plot lines
-#   if (nrow(lines_data>0)){
-#     
-#     #Plot
-#     for (i in 1:(lID-1)){
-#       line_data = subset(lines_data, ID == i)
-#       
-#       if (line_data$key_show[1]){ # Show on legend
-#         p = p + geom_line(
-#           data = line_data,
-#           aes(x = x, y = y, linetype = label),
-#           linewidth = line_data$lwidth[1],
-#           color = line_data$lcolor[1]
-#         ) 
-#       } else { # Don't show on legend
-#         p = p + geom_line(
-#           data = line_data,
-#           aes(x = x, y = y),
-#           linetype = line_data$ltype[1],
-#           linewidth = line_data$lwidth[1],
-#           color = line_data$lcolor[1]
-#         ) 
-#       }
-#     }
-#     
-#     # Add legend
-#     lines_legend = unique(subset(lines_data, key_show == TRUE)[,c("ID","label","ltype")])
-#     if (!is.null(lines_legend) && nrow(lines_legend)>0){
-#       p = p + scale_linetype_manual(values = setNames(lines_legend$ltype,lines_legend$label))
-#     }
-#   }
-#   
-#   # Plot Boxes
-#   if (nrow(boxes_data>0)){
-#     
-#     #Plot
-#     for (i in 1:(bID-1)){
-#       box_data = subset(boxes_data, ID == i)
-#       
-#       if (box_data$key_show){ # Show on legend
-#         p = p +  geom_rect(
-#           data = box_data,
-#           aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2, color = label),
-#           fill = "white", alpha = 0, linewidth = 1,
-#           inherit.aes = FALSE
-#         ) 
-#       } else { # Don't show on legend
-#         p = p +  geom_rect(
-#           data = box_data,
-#           aes(xmin = x1, xmax = x2, ymin = y1, ymax = y2),
-#           color = box_data$bcolor,
-#           fill = "white", alpha = 0, linewidth = 1,
-#           inherit.aes = FALSE
-#         )  
-#       }
-#     }
-#     
-#     # Add legend
-#     boxes_legend = unique(subset(boxes_data, key_show == TRUE)[,c("ID","label","bcolor")])
-#     if (!is.null(boxes_legend) && nrow(boxes_legend)>0){
-#       p = p + scale_color_manual(values = setNames(boxes_legend$bcolor,boxes_legend$label))
-#     }
-#   }
-#   
-#   # Plot points
-#   if (nrow(points_data)>0){
-#     
-#     for (i in 1:nrow(points_data)){
-#       point_data = points_data[i,]
-#       
-#       if (point_data$key_show){ # Show on legend
-#         p = p + geom_point(
-#           data = point_data,
-#           aes(x = x, y = y, shape = label),
-#           size = point_data$psize,
-#           color = point_data$pcolor
-#         ) 
-#       } else { # Don't show on legend
-#         p = p + geom_point(
-#           data = point_data,
-#           aes(x = x, y = y),
-#           shape = point_data$pshape,
-#           size = point_data$psize,
-#           color = point_data$pcolor
-#         )
-#       }  
-#       # Add labels
-#       if (type == "Composites"){start_ID = 1} else {start_ID = 0}
-#       
-#       if (point_data$ID > start_ID) {
-#         p <- p + geom_text(
-#           data = point_data,
-#           aes(x = x, y = y, label = label),
-#           vjust = -1.5,   # vertical adjustment
-#           hjust = 0.5,  # horizontal adjustment
-#           size = 5,     # text size
-#           color = "black"  # or any color you want
-#         )
-#       }
-#     }
-#     
-#     # Add legend
-#     points_legend = unique(subset(points_data, key_show == TRUE)[,c("ID","label","pshape")])
-#     if (!is.null(points_legend) && nrow(points_legend)>0){
-#       p = p + scale_shape_manual(values = setNames(points_legend$pshape,points_legend$label))
-#     }
-#   }
-#   
-#   
-#   # Add theme
-#   p <- p + theme_bw(base_size = 18)
-#   
-#   # Add title and subtitle if provided
-#   if (!is.null(titles)) {
-#     p <- p + labs(x = "Year", y = titles$ts_axis)
-#     
-#     # Add secondary axis for correlation
-#     if (type =="Correlation"){
-#       p = p + scale_y_continuous(
-#         name = sub(";.*$", "", titles$V1_axis_label),
-#         limits = c(y_Min,y_Max),expand = c(0, 0),
-#         sec.axis = sec_axis(~ ( . - min_v1) / (max_v1 - min_v1) * (max_v2 - min_v2) + min_v2,
-#                             name = sub(";.*$", "", titles$V2_axis_label)) # Shift and scale the secondary axis
-#       ) +
-#         
-#         theme(
-#           axis.title.y = element_text(color = titles$V1_color),
-#           axis.title.y.right = element_text(color = titles$V2_color)
-#         ) 
-#     }
-#     
-#     # Get rid of titles for Regression Residual TS
-#     if (type =="Regression_Residual"){
-#       titles$ts_title = "  "
-#       titles$ts_subtitle = "  "
-#     }
-#     
-#     if (titles$ts_title != " ") {
-#       p <- p + ggtitle(titles$ts_title)
-#     }
-#     
-#     # if (!is.null(titles$ts_subtitle)) {
-#     #   p <- p + labs(subtitle = titles$ts_subtitle)
-#     # }
-#     
-#     if (!is.null(titles$ts_subtitle) && !is.na(titles$ts_subtitle) && titles$ts_subtitle != "") {
-#       p <- p + labs(subtitle = titles$ts_subtitle)
-#     }
-#     
-#     p <- p + theme(
-#       plot.title = element_text(size = titles$ts_title_size, face = "bold"),
-#       plot.subtitle = element_text(size = titles$ts_title_size / 1.3, face = "plain"),
-#       axis.text=element_text(size = titles$ts_title_size / 1.6),
-#     )
-#   } 
-#   
-#   # Set legend groupings
-#   if (type == "Composites") {
-#     p <- p + guides(
-#       fill = guide_legend(title = NULL, order = 3),
-#       color = guide_legend(title = NULL, order = 4),
-#       linetype = guide_legend(title = NULL, order = 2),
-#       shape = guide_legend(title = "Legend", order = 1)
-#     )
-#   } else {
-#     p <- p + guides(
-#       fill = guide_legend(title = NULL, order = 3),
-#       color = guide_legend(title = NULL, order = 4),
-#       linetype = guide_legend(title = "Legend", order = 1),
-#       shape = guide_legend(title = NULL, order = 2)
-#     )
-#   }
-#   
-#   # Set legend visibility and position
-#   if (show_key) {
-#     p <- p + theme(legend.position = key_position)  # Apply the position from `key_position`
-#   } else {
-#     p <- p + theme(legend.position = "none")  # Remove the legend if `show_key == FALSE`
-#   }
-#   
-#   # Optional: If you want to make sure legends don’t appear for other components when `show_key == FALSE`
-#   if (!show_key) {
-#     p <- p + guides(fill= "none",color= "none", linetype = "none",shape= "none")  # Ensure guides are turned off
-#   }
-#   
-#   # Remove whitespace
-#   p <- p + scale_x_continuous(limits = year_range,expand = c(0, 0))
-#   if(type != "Correlation"){
-#     p = p + scale_y_continuous(limits = c(y_Min,y_Max),expand = c(0, 0))
-#   }
-#   
-#   # Add tick marks
-#   if (show_ticks) {
-#     p <- p + scale_x_continuous(
-#       limits = year_range,
-#       expand = c(0, 0),
-#       breaks = seq(year_range[1], year_range[2], by = tick_interval)
-#     )
-#   } else {
-#     p <- p + scale_x_continuous(
-#       limits = year_range,
-#       expand = c(0, 0)
-#     )
-#   }
-#   
-#   # Add reference line
-#   if (show_ref){
-#     p = p + 
-#       geom_hline(yintercept = 0, color = "black", linetype = "solid", size = 1) +  
-#       annotate("text", 
-#                x = year_range[1] + diff(year_range)/25.5,  # mimic text_x offset
-#                y = 0,                                      # label at line
-#                label = paste0(ref, titles$v_unit),
-#                vjust = -0.5,                               # just above line
-#                size = 5)
-#   }
-#   
-#   # Return the final plot
-#   return(p)
-# }
-
 plot_timeseries <- function(type,
                             mode = NA,
                             data = NA,
@@ -2886,12 +2249,12 @@ plot_timeseries <- function(type,
                             points = NA,
                             axis_range = NULL)
 {
-  # ---------- tiny helpers (local; no API change) ----------
+  # tiny helpers (local; no API change)
   nz <- function(x) !is.null(x) && length(x) > 0 && !all(is.na(x))
   safe_min <- function(x) suppressWarnings(min(x, na.rm = TRUE))
   safe_max <- function(x) suppressWarnings(max(x, na.rm = TRUE))
   
-  # ---------- Init containers ----------
+  # Init containers
   lines_data  <- data.frame(matrix(ncol = 8, nrow = 0))
   colnames(lines_data) <- c("ID","label","x","y","lcolor","ltype","lwidth","key_show")
   
@@ -2906,7 +2269,7 @@ plot_timeseries <- function(type,
   
   lID <- 1 ; pID <- 1 ; fID <- 1 ; bID <- 1
   
-  # ---------- Y-range detection (fast & robust) ----------
+  # Y-range detection (fast & robust)
   if (identical(type, "Correlation")) {
     y_min <- safe_min(data_v1[, 2])
     y_max <- safe_max(data_v1[, 2])
@@ -2939,7 +2302,7 @@ plot_timeseries <- function(type,
     year_range <- range(year_range, na.rm = TRUE)
   }
   
-  # ---------- "white" line to enforce axis limits (unchanged semantics) ----------
+  # "white" line to enforce axis limits (unchanged semantics)
   if (nz(year_range)) {
     new_line <- data.frame(
       ID = lID,
@@ -2955,7 +2318,7 @@ plot_timeseries <- function(type,
     lID <- lID + 1
   }
   
-  # ---------- Custom lines (vectorize input; no plot loops) ----------
+  # Custom lines (vectorize input; no plot loops)
   if (nz(lines) && nrow(lines) > 0 && nz(year_range)) {
     lin <- lines
     is_vert <- lin$orientation == "Vertical"
@@ -3004,7 +2367,7 @@ plot_timeseries <- function(type,
     }
   }
   
-  # ---------- Percentile lines (only if requested) ----------
+  # Percentile lines (only if requested)
   if (isTRUE(custom_percentile) && nz(data)) {
     percentile_column <- if (isTRUE(moving_ave)) 6 else 5
     if (ncol(data) >= percentile_column + 1) {
@@ -3034,7 +2397,7 @@ plot_timeseries <- function(type,
     }
   }
   
-  # ---------- Main series ----------
+  # Main series
   if (identical(type, "Anomaly") || identical(type, "Monthly")) {
     new_line <- data.frame(
       ID = lID,
@@ -3068,7 +2431,7 @@ plot_timeseries <- function(type,
       x = as.double(data$Year),
       y = data[, 2],
       pcolor = get_variable_properties(variable)$color,
-      pshape = "●",
+      pshape = 16,
       psize  = as.integer(4),
       key_show = TRUE
     )
@@ -3104,7 +2467,7 @@ plot_timeseries <- function(type,
     stop("Invalid plot type")
   }
   
-  # ---------- Secondary line for Correlation ----------
+  # Secondary line for Correlation
   if (identical(type, "Correlation")) {
     min_v1 <- y_min; max_v1 <- y_max
     min_v2 <- safe_min(data_v2[, 2]); max_v2 <- safe_max(data_v2[, 2])
@@ -3126,7 +2489,7 @@ plot_timeseries <- function(type,
     lines_data <- rbind(lines_data, new_line); lID <- lID + 1
   }
   
-  # ---------- Trend overlay for Regression_Trend ----------
+  # Trend overlay for Regression_Trend
   if (identical(type, "Regression_Trend")) {
     new_line <- data.frame(
       ID = lID,
@@ -3141,7 +2504,7 @@ plot_timeseries <- function(type,
     lines_data <- rbind(lines_data, new_line); lID <- lID + 1
   }
   
-  # ---------- Moving averages ----------
+  # Moving averages
   if (isTRUE(moving_ave)) {
     if (identical(type, "Correlation")) {
       average_line <- data.frame(
@@ -3183,7 +2546,7 @@ plot_timeseries <- function(type,
     }
   }
   
-  # ---------- Custom points ----------
+  # Custom points
   if (nz(points) && nrow(points) > 0) {
     pts <- data.frame(
       ID     = pID + seq_len(nrow(points)) - 1,
@@ -3199,7 +2562,7 @@ plot_timeseries <- function(type,
     pID <- pID + nrow(points)
   }
   
-  # ---------- Highlights: fills & boxes ----------
+  # Highlights: fills & boxes
   if (nz(highlights) && nrow(highlights) > 0) {
     if (any(highlights$type == "Fill", na.rm = TRUE)) {
       fills <- subset(highlights, type == "Fill")
@@ -3229,7 +2592,7 @@ plot_timeseries <- function(type,
     }
   }
   
-  # ---------- Build plot (vectorized geoms; no per-ID loops) ----------
+  # Build plot (vectorized geoms; no per-ID loops)
   p <- ggplot()
   
   # Fills
@@ -3259,7 +2622,7 @@ plot_timeseries <- function(type,
     }
   }
   
-  # ---------- Lines (legend colour = lcolor, like monthly TS) ----------
+  # Lines (legend colour = lcolor, like monthly TS)
   if (nrow(lines_data) > 0) {
     
     # Loop over each line ID so we can keep colour as a constant per line
@@ -3322,34 +2685,46 @@ plot_timeseries <- function(type,
   
   # Points
   if (nrow(points_data) > 0) {
+    # Legend-Punkte (key_show == TRUE)
     pt_leg <- subset(points_data, key_show %in% TRUE)
     if (nrow(pt_leg) > 0) {
-      p <- p + geom_point(
+      p <- p + ggplot2::geom_point(
         data = pt_leg,
-        aes(x = x, y = y, shape = label),
-        size = pt_leg$psize, color = pt_leg$pcolor
+        ggplot2::aes(x = x, y = y, shape = label),
+        size  = pt_leg$psize,
+        colour = pt_leg$pcolor
       )
       map_shapes <- unique(pt_leg[, c("label","pshape")])
-      p <- p + scale_shape_manual(values = setNames(map_shapes$pshape, map_shapes$label))
+      p <- p + ggplot2::scale_shape_manual(
+        values = setNames(map_shapes$pshape, map_shapes$label)
+      )
+      # keine scale_colour_manual → Farblegende der Boxen bleibt intakt
     }
+    
+    # Punkte ohne Legende (key_show == FALSE)
     pt_noleg <- subset(points_data, !key_show %in% TRUE)
     if (nrow(pt_noleg) > 0) {
-      p <- p + geom_point(
+      p <- p + ggplot2::geom_point(
         data = pt_noleg,
-        aes(x = x, y = y),
-        shape = pt_noleg$pshape, size = pt_noleg$psize, color = pt_noleg$pcolor,
+        ggplot2::aes(x = x, y = y),
+        shape  = pt_noleg$pshape,
+        size   = pt_noleg$psize,
+        colour = pt_noleg$pcolor,
         show.legend = FALSE
       )
     }
     
-    # Labels for composites or custom points (same semantics)
+    # Labels (Text über den Punkten)
     start_ID <- if (identical(type, "Composites")) 1 else 0
     lab_df <- subset(points_data, ID > start_ID & nz(label))
     if (nrow(lab_df) > 0) {
-      p <- p + geom_text(
+      p <- p + ggplot2::geom_text(
         data = lab_df,
-        aes(x = x, y = y, label = label),
-        vjust = -1.5, hjust = 0.5, size = 5, color = "black", show.legend = FALSE
+        ggplot2::aes(x = x, y = y, label = label),
+        vjust = -1.5, hjust = 0.5,
+        size  = 5,
+        colour = "black",
+        show.legend = FALSE
       )
     }
   }
@@ -3396,18 +2771,27 @@ plot_timeseries <- function(type,
   
   # Legend grouping & visibility (unchanged behavior)
   if (identical(type, "Composites")) {
+    # Variable-Farbe holen (Fallback: schwarz, falls NULL)
+    main_col <- get_variable_properties(variable)$color
+    if (is.null(main_col) || is.na(main_col)) main_col <- "black"
+    
     p <- p + guides(
-      fill = guide_legend(title = NULL, order = 3),
-      color = guide_legend(title = NULL, order = 4),
+      fill     = guide_legend(title = NULL, order = 3),
+      color    = guide_legend(title = NULL, order = 4),
       linetype = guide_legend(title = NULL, order = 2),
-      shape = guide_legend(title = "Legend", order = 1)
+      shape    = guide_legend(
+        title = "Legend",
+        order = 1,
+        # HIER der Trick: Legenden-Symbol in der richtigen Farbe zeichnen
+        override.aes = list(colour = main_col, size = 4)
+      )
     )
   } else {
     p <- p + guides(
-      fill = guide_legend(title = NULL, order = 3),
-      color = guide_legend(title = NULL, order = 4),
+      fill     = guide_legend(title = NULL, order = 3),
+      color    = guide_legend(title = NULL, order = 4),
       linetype = guide_legend(title = "Legend", order = 1),
-      shape = guide_legend(title = NULL, order = 2)
+      shape    = guide_legend(title = NULL, order = 2)
     )
   }
   
@@ -5467,8 +4851,8 @@ generate_correlation_titles = function(variable1_source,
                                        map_custom_title,
                                        map_custom_subtitle,
                                        ts_custom_title,
-                                       map_title_size,
-                                       ts_title_size) {
+                                       map_title_size=18,
+                                       ts_title_size=18) {
   
   
   # Set values for variable 1:
@@ -5610,8 +4994,8 @@ generate_correlation_titles = function(variable1_source,
   file_title = iconv(tf2, from = 'UTF-8', to = 'ASCII//TRANSLIT')
   
   # Title font size
-  map_title_size = map_title_size
-  ts_title_size = ts_title_size
+  map_title_size <- ifelse(map_title_mode == "Custom", map_title_size, 18)
+  ts_title_size <- ifelse(ts_title_mode == "Custom", ts_title_size, 18)
   
   cor_titles = data.frame(
     map_title,
@@ -6516,7 +5900,7 @@ generate_regression_titles_ts = function(independent_source,
                                          map_title_mode,
                                          map_custom_title,
                                          map_custom_subtitle,
-                                         title_size
+                                         title_size=18
 ){
   
   # Create Independent variable titles
@@ -6638,7 +6022,8 @@ generate_regression_titles_ts = function(independent_source,
                         title_mode_d, sep = "")
   }
   
-  ts_title_size = title_size
+  # Adapt title size
+  ts_title_size <- ifelse(map_title_mode == "Custom", title_size, 18)
   
   # Combine all titles into a dataframe
   titles_df = data.frame(
@@ -7425,10 +6810,10 @@ plot_monthly_timeseries <- function(data = NA,
   colnames(points_data) = c("ID","label","x","y","pcolor","pshape","psize","key_show")
   
   fills_data = data.frame(matrix(ncol = 8, nrow = 0))
-  colnames(points_data) = c("ID","label","x1","x2","y1","y2","fill","key_show")
+  colnames(fills_data) = c("ID","label","x1","x2","y1","y2","fill","key_show")
   
   boxes_data = data.frame(matrix(ncol = 8, nrow = 0))
-  colnames(points_data) = c("ID","label","x1","x2","y1","y2","bcolor","key_show")
+  colnames(boxes_data) = c("ID","label","x1","x2","y1","y2","bcolor","key_show")
   
   # Set up inital row IDs
   lID = 1 ; pID = 1 ; fID = 1 ; bID = 1
