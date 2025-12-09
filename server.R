@@ -9095,7 +9095,7 @@ server <- function(input, output, session) {
     }
     
     if (input$show_pvalues_6){
-      alternative_SEA = dplR::sea(ts_data(),event_years_cut(),lag = max(abs(input$lag_years_6)))
+      alternative_SEA = dplR::sea(ts_data(),event_years_cut(),lag = max(abs(input$lag_years_6)), resample =input$sample_size_6)
       P = alternative_SEA$p[which(alternative_SEA$lag %in% SEA_data()$actual$lag)]
       SEAdatatable = data.frame(SEAdatatable,P)
     }
