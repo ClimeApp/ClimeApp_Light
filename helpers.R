@@ -4669,26 +4669,29 @@ extract_year_range = function(variable1_source,
 #'
 #' @return A data frame with two columns: `"Year"` (adjusted for lag) and the selected variable values (numeric).
 
-create_user_data_subset = function(data_input,
-                                   variable,
-                                   year_range,
-                                   lag = 0) {
-  lagged_year_range = year_range + lag
-  UD_ss_year_range = subset(data_input,
-                            data_input[, 1] >= lagged_year_range[1] &
-                              data_input[, 1] <= lagged_year_range[2])
-  UD_ss_variable = UD_ss_year_range[, variable]
-  UD_ss_year = UD_ss_year_range[, 1] - lag
+create_user_data_subset <- function(data_input,
+                                    variable,
+                                    year_range,
+                                    lag = 0) {
+  # 1. Nur nach dem gewählten Fenster subsetten (ohne Lag!)
+  UD_ss_year_range <- subset(
+    data_input,
+    data_input[, 1] >= year_range[1] &
+      data_input[, 1] <= year_range[2]
+  )
   
-  UD_ss = data.frame(UD_ss_year, UD_ss_variable)
-  colnames(UD_ss) = c("Year", variable)
+  # 2. Variable extrahieren
+  UD_ss_variable <- UD_ss_year_range[, variable]
   
-  # Replace missing values an text with NAs
-  UD_ss[, 2] = as.numeric(UD_ss[, 2])
+  # 3. Jahre für den Plot / die Analyse verschieben
+  UD_ss_year <- UD_ss_year_range[, 1] + lag
   
+  UD_ss <- data.frame(UD_ss_year, UD_ss_variable)
+  colnames(UD_ss) <- c("Year", variable)
+  
+  UD_ss[, 2] <- as.numeric(UD_ss[, 2])
   return(UD_ss)
 }
-
 
 #' (Regression/Correlation) Extract Shared LonLat Values
 #'

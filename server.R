@@ -3540,14 +3540,22 @@ server <- function(input, output, session) {
     input$user_variable_v1
     input$user_variable_v2
   }, {
-    # year_range_cor() wird hier nur gelesen → kein eigener Trigger,
-    # weil observeEvent den Handler isoliert ausführt.
     yr <- year_range_cor()
     req(yr, length(yr) >= 10)
     
-    # Nur falls überhaupt User-Daten im Spiel sind
-    if (input$source_v1 == "User data" && input$source_v2 == "User data") {
-      # beide User-Daten → Überschneidungsbereich
+    # Fall A: ModE vs ModE → Default-Range (z.B. 1422–2008)
+    if (input$source_v1 != "User data" && input$source_v2 != "User data") {
+      
+      shinyWidgets::updateNumericRangeInput(
+        session = getDefaultReactiveDomain(),
+        inputId = "range_years3",
+        label = paste("Select the range of years (", yr[1], "-", yr[2], ")"),
+        value = yr[1:2]   # typischerweise 1422–2008
+      )
+      
+      # Fall B: beide User-Daten → Überschneidungsbereich
+    } else if (input$source_v1 == "User data" && input$source_v2 == "User data") {
+      
       shinyWidgets::updateNumericRangeInput(
         session = getDefaultReactiveDomain(),
         inputId = "range_years3",
@@ -3555,8 +3563,9 @@ server <- function(input, output, session) {
         value = yr[5:6]
       )
       
+      # Fall C: nur v1 ist User-Daten
     } else if (input$source_v1 == "User data") {
-      # nur v1 User-Daten
+      
       shinyWidgets::updateNumericRangeInput(
         session = getDefaultReactiveDomain(),
         inputId = "range_years3",
@@ -3564,8 +3573,9 @@ server <- function(input, output, session) {
         value = yr[1:2]
       )
       
+      # Fall D: nur v2 ist User-Daten
     } else if (input$source_v2 == "User data") {
-      # nur v2 User-Daten
+      
       shinyWidgets::updateNumericRangeInput(
         session = getDefaultReactiveDomain(),
         inputId = "range_years3",
@@ -5469,7 +5479,7 @@ server <- function(input, output, session) {
       )
     } else if (input$nav1 == "tab3") {
       # Correlation
-      adjusted_years = input$range_years3 + input$lagyears_v1_cor
+      adjusted_years = input$range_years3 - input$lagyears_v1_cor
       create_yearly_subset(
         data_input = data_output1_primary(),
         data_ID = data_id_primary(),
@@ -5490,7 +5500,7 @@ server <- function(input, output, session) {
   data_output2_secondary <- reactive({
     if (input$nav1 == "tab3") {
       # Correlation
-      adjusted_years = input$range_years3 + input$lagyears_v2_cor
+      adjusted_years = input$range_years3 - input$lagyears_v2_cor
       create_yearly_subset(
         data_input = data_output1_secondary(),
         data_ID = data_id_secondary(),
@@ -7330,8 +7340,8 @@ server <- function(input, output, session) {
         variable2_data_filepath = input$user_file_v2$datapath,
         variable1_name = input$user_variable_v1,
         variable2_name = input$user_variable_v2,
-        variable1_lag = input$lagyears_v1_cor,
-        variable2_lag = input$lagyears_v2_cor
+        variable1_lag = 0,
+        variable2_lag = 0
       )
       
       return(year_range)
@@ -7383,29 +7393,33 @@ server <- function(input, output, session) {
   })
   
   # Subset v1 data to year_range and chosen variable
-  user_subset_v1 = reactive({
+  user_subset_v1 <- reactive({
     req(user_data_v1(), input$user_variable_v1)
     
-    usr_ss1 = create_user_data_subset(
+    # Fenster in Roh-Datenkoordinaten verschieben (wie bei ModE):
+    raw_range <- input$range_years3 - input$lagyears_v1_cor
+    
+    usr_ss1 <- create_user_data_subset(
       data_input = user_data_v1(),
-      variable = input$user_variable_v1,
-      year_range = input$range_years3,
-      lag = input$lagyears_v1_cor # pass the lag
+      variable   = input$user_variable_v1,
+      year_range = raw_range,                  # <--- verschobenes Fenster
+      lag        = input$lagyears_v1_cor       # <--- verschiebt die Year-Spalte
     )
     
     return(usr_ss1)
   })
   
   # Subset v2 data to year_range and chosen variable
-  user_subset_v2 = reactive({
+  user_subset_v2 <- reactive({
+    req(user_data_v2(), input$user_variable_v2)
     
-    req(user_data_v2(),input$user_variable_v2)
+    raw_range <- input$range_years3 - input$lagyears_v2_cor
     
-    usr_ss2 = create_user_data_subset(
+    usr_ss2 <- create_user_data_subset(
       data_input = user_data_v2(),
-      variable = input$user_variable_v2,
-      year_range = input$range_years3,
-      lag = input$lagyears_v2_cor # pass the lag
+      variable   = input$user_variable_v2,
+      year_range = raw_range,
+      lag        = input$lagyears_v2_cor
     )
     
     return(usr_ss2)
