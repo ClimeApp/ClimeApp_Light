@@ -1474,11 +1474,11 @@ ui <- navbarPage(
                                                                                        image.width = spinner_width,
                                                                                        image.height = spinner_height))),                                      
                                    
-                                   tabPanel("Download NETcdf data",
-                                            br(), h4("Download NETcdf with one or more variable", style = "color: #094030;", netcdf_popover("pop_anomalies_netcdf")),
+                                   tabPanel("Download NetCDF data",
+                                            br(), h4("Download NetCDF with one or more variable", style = "color: #094030;", netcdf_popover("pop_anomalies_netcdf")),
                                             #NETcdf download pickerInput checkboxGroupInput
                                             column(3, shinyWidgets::pickerInput(inputId = "netcdf_variables", label = "Choose one or multiple variables:", choices = NULL, selected = NULL, inline = TRUE, multiple = TRUE,)),
-                                            column(3, downloadButton(outputId = "download_netcdf", label = "Download NETcdf"))),
+                                            column(3, downloadButton(outputId = "download_netcdf", label = "Download NetCDF"))),
                                    
                                    ### Feedback archive documentation (FAD) ----
                                    tabPanel("ModE-RA sources", br(),
