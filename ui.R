@@ -602,7 +602,7 @@ ui <- navbarPage(
                              label    = "Choose a variable to plot:",
                              choices  = c("Temperature", "Precipitation", "SLP", "Z500"),
                              selected = "Temperature"),
-                 
+
                ), width = 12), br(),
                
                ### Second Sidebar panel (Time selection) ----
@@ -854,6 +854,8 @@ ui <- navbarPage(
                                                                               max = 180,
                                                                               updateOn = "blur"
                                                                  ))),
+                                                           
+                                                           checkboxInput("map_contour", "Use grid cells", value = FALSE),
                                                            
                                                            radioButtons(inputId  = "axis_mode",
                                                                         label    = "Axis customization:",
@@ -1852,6 +1854,8 @@ ui <- navbarPage(
                                                                               min = -180,
                                                                               max = 180,
                                                                               updateOn = "blur"))),
+                                                           
+                                                           checkboxInput("map_contour2", "Use grid cells", value = FALSE),
                                                            
                                                            radioButtons(inputId  = "axis_mode2",
                                                                         label    = "Axis customization:",
@@ -3968,6 +3972,8 @@ ui <- navbarPage(
                                                                               min = -180,
                                                                               max = 180,
                                                                               updateOn = "blur"))),
+                                                           
+                                                           checkboxInput("map_contour3", "Use grid cells", value = FALSE),
                                                            
                                                            radioButtons(inputId  = "axis_mode3",
                                                                         label    = "Axis customization:",
