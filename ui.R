@@ -435,8 +435,9 @@ ui <- navbarPage(
                                       tags$li("Pre-loaded and pre-processed data")
                                     ),
                                     br(),
-                                    downloadButton("climeapp_desktop_download",
-                                                   label = "Download ClimeApp desktop"),
+                                    # downloadButton("climeapp_desktop_download",
+                                    #                label = "Download ClimeApp desktop"),
+                                    uiOutput("climeapp_desktop_link"),
                                     br(), br(), br(),
                                     
                                     h5(strong("ClimeApp desktop user guide", style = "color: #094030;")),

@@ -6,12 +6,21 @@ server <- function(input, output, session) {
     updateTabsetPanel(session, "main_tabs", selected = "desktop_tab")
   })
   
-  output$climeapp_desktop_download <- downloadHandler(
-    filename = function() {"ClimeApp Desktop Installer.zip"},
-    content = function(file) {
-      file.copy("ClimeApp Desktop Installer.zip",file)
-    }
-  )
+  # output$climeapp_desktop_download <- downloadHandler(
+  #   filename = function() {"ClimeApp Desktop Installer.zip"},
+  #   content = function(file) {
+  #     file.copy("ClimeApp Desktop Installer.zip",file)
+  #   }
+  # )
+  
+  output$climeapp_desktop_link <- renderUI({
+    tags$a(
+      href = "/downloads/ClimeApp_Desktop_Installer.zip",
+      class = "btn btn-primary",
+      target = "_blank",
+      "Download ClimeApp desktop"
+    )
+  })
   
   coords_committed <- reactiveVal(list(
     lon = initial_lon_values,
