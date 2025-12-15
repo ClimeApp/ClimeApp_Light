@@ -1690,7 +1690,7 @@ plot_map <- function(data_input,
       colors = v_col,
       n.breaks = 20,
       nice.breaks = TRUE,
-      na.value = if (identical(surface, "grid")) "white" else "transparent",
+      na.value = "transparent",
       labels = function(breaks) {
         labels <- as.character(round(breaks, 2))
         labels[1] <- paste0("< ", labels[1])
