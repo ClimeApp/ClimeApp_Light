@@ -308,6 +308,8 @@ ui <- navbarPage(
                                     h5(helpText("R. Warren, N. Bartlome, N. Wellinger, J. Franke, R. Hand, S. Br\u00F6nnimann, H. Huhtamaa: ClimeApp: data processing tool for monthly, global climate data from the ModE-RA palaeo-reanalysis, 1422 to 2008 CE. CP 20, 2645–2662 (2024).")),
                                     h5(helpText("V. Valler, J. Franke, Y. Brugnara, E. Samakinwa, R. Hand, E. Lundstad, A.-M. Burgdorf, L. Lipfert, A. R. Friedman, S. Br\u00F6nnimann: ModE-RA: a global monthly paleo-reanalysis of the modern era 1421 to 2008. Scientific Data 11 (2024).")),
                                     h5(helpText("R. Hand, E. Samakinwa, L. Lipfert, and S. Br\u00F6nnimann: ModE-Sim – a medium-sized atmospheric general circulation model (AGCM) ensemble to study climate variability during the modern era (1420 to 2009). GMD 16 (2023).")),
+                                    h4("Licence:", style = "color: #094030;"),
+                                    h5(helpText("Results are licensed CC-BY 4.0 and may be published online with attribution.")),
                                     h5("Funding:", style = "color: #094030;"),
                                     h6(helpText("PALAEO-RA: H2020/ERC grant number 787574")),
                                     h6(helpText("DEBTS: SNSF grant number PZ00P1_201953")),
