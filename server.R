@@ -5886,7 +5886,6 @@ server <- function(input, output, session) {
   cacheKeyExpr = {
     points_key     <- tryCatch(overlay_key(map_points_data()),     error = function(e) "")
     highlights_key <- tryCatch(overlay_key(map_highlights_data()), error = function(e) "")
-
     shpfile_key <- tryCatch({
       f <- input$shpFile
       if (is.null(f)) "no-upload" else paste(
@@ -5917,20 +5916,16 @@ server <- function(input, output, session) {
     plotorder_key <- tryCatch(digest::digest(plotOrder()), error = function(e) "")
     shp_color_key <- tryCatch(digest::digest(shp_color_inputs()), error = function(e) "")
     
+    dim_key <- paste0(map_dimensions()[1], "x", map_dimensions()[2])
+    
     months_key <- tryCatch({
-      if (identical(input$season_selected, "Custom")) {
-        paste(input$range_months %||% character(0), collapse = "->")
-      } else {
-        input$season_selected %||% "Annual"
-      }
+      paste(input$range_months %||% character(0), collapse = "->")
     }, error = function(e) "no-months")
     
-
     titles_key <- tryCatch({
       digest::digest(plot_titles())
     }, error = function(e) "")
-    
-    
+
     list(
       input$nav1,
       input$value_type_map_data,
@@ -5943,7 +5938,7 @@ server <- function(input, output, session) {
       subset_lats_primary(),
       input$axis_input,
       input$hide_axis,
-      input$map_contour,   # <-- ADD THIS
+      input$map_contour,
       points_key,
       highlights_key,
       shpfile_key,
@@ -5964,13 +5959,9 @@ server <- function(input, output, session) {
       input$show_mountains,
       input$label_mountains,
       input$shapes_order[input$shapes_order %in% input$shapes],
-      input$title_mode,
-      input$title_mode_ts,
       titles_key,
-      input$title1_input_ts,
-      input$title_size_input,
-      input$title_size_input_ts,
-      months_key
+      months_key,
+      dim_key
     )
   },
   width  = function() { map_dimensions()[1] },
@@ -6765,12 +6756,12 @@ server <- function(input, output, session) {
     plotorder_key2 <- tryCatch(digest::digest(plotOrder2()), error = function(e) "")
     
     months_key2 <- tryCatch({
-      if (identical(input$season_selected2, "Custom")) {
-        paste(input$range_months2 %||% character(0), collapse = "->")
-      } else {
-        input$season_selected2 %||% "Annual"
-      }
+      paste(input$range_months2 %||% character(0), collapse = "->")
     }, error = function(e) "no-months")
+    
+    titles_key2 <- tryCatch({
+      digest::digest(plot_titles_composites())
+    }, error = function(e) "")
     
     dim_key2 <- paste0(map_dimensions_2()[1], "x", map_dimensions_2()[2])
     
@@ -6786,7 +6777,7 @@ server <- function(input, output, session) {
       subset_lats_primary(),
       input$axis_input2,
       input$hide_axis2,
-      input$map_contour2,   # <-- ADD THIS
+      input$map_contour2,
       points_key2,
       highlights_key2,
       shpfile_key2,
@@ -6808,13 +6799,7 @@ server <- function(input, output, session) {
       input$label_mountains2,
       plotOrder2(),
       input$shapes2_order[input$shapes2_order %in% input$shapes2],
-      input$title_mode2,
-      input$title_mode_ts2,
-      input$title1_input2,
-      input$title2_input2,
-      input$title1_input_ts2,
-      input$title_size_input2,
-      input$title_size_input_ts2,
+      titles_key2,
       months_key2,
       input$upload_file2,
       input$enter_upload2,
@@ -6825,8 +6810,7 @@ server <- function(input, output, session) {
   width  = function() map_dimensions_2()[1],
   height = function() map_dimensions_2()[2]
   )
-  
-  
+
   # Disable Grey land and Grey ocean for the Orthographic and LAEA projections
   allowed_projs <- c("UTM (default)", "Robinson")
   
@@ -8226,12 +8210,16 @@ server <- function(input, output, session) {
     
     corr_data_key <- tryCatch(digest::digest(correlation_map_data()), error = function(e) "")
     
-    dim_key <- paste0(correlation_map_dimensions()[1], "x", correlation_map_dimensions()[2])
+    dim_key3 <- paste0(correlation_map_dimensions()[1], "x", correlation_map_dimensions()[2])
     
     axis_input_used <- tryCatch({
       a <- input$axis_input3
       if (is.null(a) || any(is.na(a)) || length(a) != 2) "dynamic" else paste(a, collapse = "_")
     }, error = function(e) "axis-error")
+    
+    titles_key3 <- tryCatch({
+      digest::digest(plot_titles_cor())
+    }, error = function(e) "")
     
     list(
       input$nav1,
@@ -8253,7 +8241,7 @@ server <- function(input, output, session) {
       shp_ids_key,
       shp_style_key,
       shp_color_key,
-      dim_key,
+      dim_key3,
       input$hide_borders3,
       input$white_ocean3,
       input$white_land3,
@@ -8268,14 +8256,12 @@ server <- function(input, output, session) {
       input$label_mountains3,
       plotOrder3(),
       input$shapes3_order[input$shapes3_order %in% input$shapes3],
-      plot_titles_cor(),
+      titles_key3,
       "Correlation_map"
     )
   },
   width  = function() { correlation_map_dimensions()[1] },
   height = function() { correlation_map_dimensions()[2] })
-  
-  
   
   
   # Disable Grey land and Grey ocean for the Orthographic and LAEA projections
